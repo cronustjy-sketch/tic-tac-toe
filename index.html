@@ -21,8 +21,11 @@
   .tagline{color:var(--soft);font-weight:600;margin-top:.6rem;font-size:1.05rem;}
   .badge{display:inline-flex;align-items:center;gap:6px;background:var(--o-soft);color:var(--o);font-weight:700;font-size:.8rem;padding:5px 13px;border-radius:999px;margin-top:1rem;letter-spacing:.02em;}
   .card{background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:1.75rem;box-shadow:0 18px 40px -20px var(--shadow);width:100%;max-width:440px;animation:drop .7s .1s ease both;}
+  .whoami{text-align:center;font-weight:700;font-size:.85rem;color:var(--soft);margin-bottom:.75rem;}
+  .whoami b{color:var(--ink);}
+  .whoami a{color:var(--x);cursor:pointer;text-decoration:underline;}
   .modes{display:flex;gap:6px;background:var(--cream);padding:6px;border-radius:16px;margin-bottom:1rem;}
-  .mode{flex:1;border:none;background:transparent;cursor:pointer;font-family:inherit;font-weight:800;font-size:.85rem;color:var(--soft);padding:11px 4px;border-radius:11px;transition:.25s;}
+  .mode{flex:1;border:none;background:transparent;cursor:pointer;font-family:inherit;font-weight:800;font-size:.82rem;color:var(--soft);padding:11px 3px;border-radius:11px;transition:.25s;}
   .mode.active{background:var(--paper);color:var(--ink);box-shadow:0 4px 12px -6px var(--shadow);}
   .diff{display:flex;gap:8px;margin-bottom:1.25rem;}
   .diff.hidden{display:none;}
@@ -30,7 +33,7 @@
   .dbtn.active{background:var(--x-soft);color:var(--x);border-color:var(--x);}
   .online-panel{display:none;flex-direction:column;gap:10px;margin-bottom:1.25rem;}
   .online-panel.show{display:flex;}
-  .online-panel input{font-family:inherit;font-size:1rem;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.15em;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream);color:var(--ink);}
+  .online-panel input,.name-input{font-family:inherit;font-size:1rem;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.15em;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream);color:var(--ink);}
   .online-panel input:focus{outline:none;border-color:var(--x);}
   .obtn{border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:.95rem;padding:12px;border-radius:12px;transition:.2s;}
   .obtn.primary{background:var(--x);color:#fff;}
@@ -58,7 +61,24 @@
   .reset{width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:1rem;background:var(--ink);color:var(--paper);padding:14px;border-radius:16px;transition:.2s;}
   .reset:hover{transform:translateY(-2px);box-shadow:0 12px 24px -12px var(--shadow);}
   .reset:active{transform:scale(.98);}
+  .lb-toggle{width:100%;margin-top:10px;border:1px solid var(--line);cursor:pointer;font-family:inherit;font-weight:800;font-size:.95rem;background:var(--cream);color:var(--ink);padding:12px;border-radius:16px;}
+  .leaderboard{margin-top:14px;display:none;}
+  .leaderboard.show{display:block;animation:drop .4s ease both;}
+  .lb-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.2rem;margin-bottom:10px;text-align:center;}
+  .lb-row{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;font-weight:700;font-size:.9rem;}
+  .lb-row:nth-child(even){background:var(--cream);}
+  .lb-rank{color:var(--soft);font-family:'Fraunces',serif;font-weight:900;}
+  .lb-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lb-wins{color:var(--x);font-weight:800;}
+  .lb-sub{font-size:.72rem;color:var(--soft);font-weight:700;grid-column:2/4;}
+  .lb-empty,.lb-loading{text-align:center;color:var(--soft);font-weight:700;padding:14px;font-size:.9rem;}
   footer{margin-top:2rem;color:var(--soft);font-weight:600;font-size:.85rem;text-align:center;}
+  .modal{position:fixed;inset:0;background:rgba(61,58,53,.35);display:none;align-items:center;justify-content:center;padding:1rem;z-index:50;}
+  .modal.show{display:flex;}
+  .modal-card{background:var(--paper);border-radius:24px;padding:1.75rem;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px -20px var(--shadow);}
+  .modal-card h3{font-family:'Fraunces',serif;font-weight:900;font-size:1.3rem;margin-bottom:.5rem;}
+  .modal-card p{color:var(--soft);font-weight:600;font-size:.9rem;margin-bottom:1rem;}
+  .modal-card input{width:100%;margin-bottom:1rem;text-transform:none;letter-spacing:normal;text-align:center;}
   @keyframes drop{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
   @keyframes pop{0%{transform:scale(.3);opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
 </style>
@@ -71,6 +91,8 @@
   </header>
 
   <main class="card">
+    <div class="whoami" id="whoami"></div>
+
     <div class="modes">
       <button class="mode active" id="mode-2p">Two players</button>
       <button class="mode" id="mode-cpu">vs Computer</button>
@@ -100,16 +122,30 @@
     </div>
 
     <button class="reset" id="reset">New round</button>
+    <button class="lb-toggle" id="lbToggle">&#127942; Show leaderboard</button>
+
+    <div class="leaderboard" id="leaderboard">
+      <div class="lb-title">&#127942; Global Leaderboard</div>
+      <div id="lbList"><div class="lb-loading">Loading…</div></div>
+    </div>
   </main>
 
   <footer>Made to be kind. Take turns, have fun. &#10022;</footer>
 
+  <div class="modal" id="nameModal">
+    <div class="modal-card">
+      <h3>What's your name?</h3>
+      <p>Used for the global leaderboard. Saved on this device.</p>
+      <input class="name-input" id="nameInput" maxlength="20" placeholder="Your name" autocomplete="off">
+      <button class="obtn primary" id="nameSave" style="width:100%;">Save</button>
+    </div>
+  </div>
+
 <script>
 (function(){
-  // ====== PASTE YOUR PIESOCKET API KEY BELOW (between the quotes) ======
   var PIESOCKET_API_KEY = "OsYl4zuI9ZrFa1i71JGUgXfIr0gyo4YtB1JXf5lr";
-  var PIESOCKET_CLUSTER = "free.blr2"; // PieSocket free cluster; update if yours differs
-  // =====================================================================
+  var PIESOCKET_CLUSTER = "free.blr2";
+  var LEADERBOARD_URL = "https://tictactoe-leaderboard.cronustjy.workers.dev";
 
   var boardEl=document.getElementById('board');
   var statusEl=document.getElementById('status');
@@ -124,14 +160,31 @@
   var joinBtn=document.getElementById('joinBtn');
   var joinCode=document.getElementById('joinCode');
   var sx=document.getElementById('sx'),so=document.getElementById('so'),sd=document.getElementById('sd');
+  var whoami=document.getElementById('whoami');
+  var lbToggle=document.getElementById('lbToggle');
+  var leaderboard=document.getElementById('leaderboard');
+  var lbList=document.getElementById('lbList');
+  var nameModal=document.getElementById('nameModal');
+  var nameInput=document.getElementById('nameInput');
+  var nameSave=document.getElementById('nameSave');
 
   var board=Array(9).fill('');
   var current='X', over=false, scores={X:0,O:0,D:0};
   var mode='2p', difficulty='easy';
+  var streak=0;
   var wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-
-  // online state
   var ws=null, room=null, myMark=null, onlineConnected=false;
+
+  var playerName = getName();
+  function getName(){ try{ return localStorage.getItem('ttt_name') || ''; }catch(e){ return ''; } }
+  function saveName(n){ try{ localStorage.setItem('ttt_name', n); }catch(e){} playerName=n; renderWhoami(); }
+  function renderWhoami(){
+    if(playerName){ whoami.innerHTML='Playing as <b>'+escapeHtml(playerName)+'</b> · <a id="changeName">change</a>'; var cn=document.getElementById('changeName'); if(cn) cn.addEventListener('click',promptName); }
+    else { whoami.innerHTML='<a id="setName">Set your name for the leaderboard</a>'; var sn=document.getElementById('setName'); if(sn) sn.addEventListener('click',promptName); }
+  }
+  function promptName(){ nameInput.value=playerName||''; nameModal.classList.add('show'); nameInput.focus(); }
+  nameSave.addEventListener('click',function(){ var v=(nameInput.value||'').trim().slice(0,20); if(v){ saveName(v); nameModal.classList.remove('show'); } });
+  function escapeHtml(s){ return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 
   function setMode(m){
     mode=m;
@@ -143,20 +196,12 @@
     if(ws){ try{ws.close();}catch(e){} ws=null; onlineConnected=false; }
     newRound();
   }
-  function setDiff(d){
-    difficulty=d;
-    dbtns.forEach(function(b){b.classList.toggle('active',b.getAttribute('data-d')===d);});
-    newRound();
-  }
-  function newRound(sendSync){
-    board=Array(9).fill(''); current='X'; over=false;
-    render(); updateStatus();
-    if(mode==='online'&&onlineConnected&&sendSync){ sendMsg({t:'reset'}); }
-  }
+  function setDiff(d){ difficulty=d; dbtns.forEach(function(b){b.classList.toggle('active',b.getAttribute('data-d')===d);}); newRound(); }
+  function newRound(sendSync){ board=Array(9).fill(''); current='X'; over=false; render(); updateStatus(); if(mode==='online'&&onlineConnected&&sendSync){ sendMsg({t:'reset'}); } }
   function render(winLine){
     boardEl.innerHTML='';
-    var lock = (mode==='online') && (!onlineConnected || current!==myMark || over);
-    boardEl.classList.toggle('locked', lock && !over ? true : false);
+    var lock=(mode==='online')&&(!onlineConnected||current!==myMark||over);
+    boardEl.classList.toggle('locked', lock&&!over);
     board.forEach(function(v,i){
       var c=document.createElement('button');
       c.className='cell'+(v?' taken '+v.toLowerCase():'');
@@ -170,16 +215,13 @@
     if(mode==='online'){
       if(!onlineConnected){ statusEl.textContent='Create or join a room to start'; return; }
       if(over) return;
-      statusEl.textContent = (current===myMark) ? "Your turn ("+myMark+")" : "Friend's turn ("+current+")";
+      statusEl.textContent=(current===myMark)?"Your turn ("+myMark+")":"Friend's turn ("+current+")";
       return;
     }
     if(mode==='cpu'&&current==='O'){ statusEl.textContent="Computer's turn"; return; }
     statusEl.textContent="Player "+current+"'s turn";
   }
-  function winningLine(b,p){
-    for(var k=0;k<wins.length;k++){ if(wins[k].every(function(i){return b[i]===p;})) return wins[k]; }
-    return null;
-  }
+  function winningLine(b,p){ for(var k=0;k<wins.length;k++){ if(wins[k].every(function(i){return b[i]===p;})) return wins[k]; } return null; }
   function emptyCells(b){ var e=[]; for(var i=0;i<9;i++) if(b[i]==='') e.push(i); return e; }
 
   function play(i){
@@ -187,21 +229,14 @@
     if(mode==='cpu'&&current==='O') return;
     if(mode==='online'){
       if(!onlineConnected||current!==myMark) return;
-      board[i]=current;
-      sendMsg({t:'move',i:i,mark:current});
+      board[i]=current; sendMsg({t:'move',i:i,mark:current});
       if(finish()) return;
-      current=current==='X'?'O':'X';
-      render(); updateStatus();
-      return;
+      current=current==='X'?'O':'X'; render(); updateStatus(); return;
     }
     board[i]=current;
     if(finish()) return;
-    current=current==='X'?'O':'X';
-    render(); updateStatus();
-    if(mode==='cpu'&&current==='O'&&!over){
-      statusEl.textContent='Computer thinking…';
-      setTimeout(cpuMove,450);
-    }
+    current=current==='X'?'O':'X'; render(); updateStatus();
+    if(mode==='cpu'&&current==='O'&&!over){ statusEl.textContent='Computer thinking…'; setTimeout(cpuMove,450); }
   }
   function finish(){
     var line=winningLine(board,current);
@@ -210,79 +245,93 @@
       sx.textContent=scores.X; so.textContent=scores.O; sd.textContent=scores.D;
       render(line);
       var who;
-      if(mode==='online') who = (current===myMark?'You win!':'Friend wins!');
-      else if(mode==='cpu'&&current==='O') who='Computer wins!';
+      if(mode==='online'){ who=(current===myMark?'You win!':'Friend wins!'); reportOnline(current===myMark?'win':'loss'); }
+      else if(mode==='cpu'){
+        if(current==='X'){ who='You win!'; streak++; report('win'); }
+        else { who='Computer wins!'; streak=0; report('loss'); }
+      }
       else who='Player '+current+' wins!';
       statusEl.textContent=who+' \uD83C\uDF89';
       return true;
     }
     if(board.every(function(c){return c!=='';})){
-      over=true; scores.D++; sd.textContent=scores.D;
-      render();
+      over=true; scores.D++; sd.textContent=scores.D; render();
       statusEl.textContent="It's a draw! \uD83E\uDD1D";
+      if(mode==='cpu'){ streak=0; report('draw'); }
+      else if(mode==='online') reportOnline('draw');
       return true;
     }
     return false;
   }
 
-  // ---- AI ----
-  function findTwo(p){
-    for(var k=0;k<wins.length;k++){
-      var ln=wins[k], vv=ln.map(function(i){return board[i];});
-      if(vv.filter(function(x){return x===p;}).length===2&&vv.indexOf('')!==-1) return ln[vv.indexOf('')];
-    }
-    return null;
-  }
+  function findTwo(p){ for(var k=0;k<wins.length;k++){ var ln=wins[k],vv=ln.map(function(i){return board[i];}); if(vv.filter(function(x){return x===p;}).length===2&&vv.indexOf('')!==-1) return ln[vv.indexOf('')]; } return null; }
   function tacticalMove(){ var w=findTwo('O'); if(w!==null) return w; var b=findTwo('X'); if(b!==null) return b; if(board[4]==='') return 4; return null; }
   function minimax(b,player){
     if(winningLine(b,'O')) return {score:10};
     if(winningLine(b,'X')) return {score:-10};
     var avail=emptyCells(b); if(avail.length===0) return {score:0};
     var best=(player==='O')?{score:-999}:{score:999};
-    for(var n=0;n<avail.length;n++){
-      var idx=avail[n]; b[idx]=player;
-      var r=minimax(b,player==='O'?'X':'O'); b[idx]='';
-      if(player==='O'){ if(r.score>best.score) best={score:r.score,move:idx}; }
-      else{ if(r.score<best.score) best={score:r.score,move:idx}; }
-    }
+    for(var n=0;n<avail.length;n++){ var idx=avail[n]; b[idx]=player; var r=minimax(b,player==='O'?'X':'O'); b[idx]='';
+      if(player==='O'){ if(r.score>best.score) best={score:r.score,move:idx}; } else { if(r.score<best.score) best={score:r.score,move:idx}; } }
     return best;
   }
   function cpuMove(){
     var empty=emptyCells(board), move;
-    if(difficulty==='easy'){
-      if(Math.random()<0.7) move=empty[Math.floor(Math.random()*empty.length)];
-      else{ move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; }
-    } else if(difficulty==='medium'){
-      if(Math.random()<0.8){ move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; }
-      else move=empty[Math.floor(Math.random()*empty.length)];
-    } else {
-      move=minimax(board.slice(),'O').move;
-      if(move===undefined||move===null) move=empty[Math.floor(Math.random()*empty.length)];
-    }
-    board[move]='O';
-    if(finish()) return;
-    current='X'; render(); updateStatus();
+    if(difficulty==='easy'){ if(Math.random()<0.7) move=empty[Math.floor(Math.random()*empty.length)]; else { move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; } }
+    else if(difficulty==='medium'){ if(Math.random()<0.8){ move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; } else move=empty[Math.floor(Math.random()*empty.length)]; }
+    else { move=minimax(board.slice(),'O').move; if(move===undefined||move===null) move=empty[Math.floor(Math.random()*empty.length)]; }
+    board[move]='O'; if(finish()) return; current='X'; render(); updateStatus();
   }
 
-  // ---- ONLINE (PieSocket) ----
-  function randCode(){ var c='', a='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; for(var i=0;i<4;i++) c+=a[Math.floor(Math.random()*a.length)]; return c; }
-  function connect(code, asHost){
-    if(PIESOCKET_API_KEY==='PASTE_YOUR_KEY_HERE'){
-      statusEl.textContent='Add your PieSocket key first';
-      return;
-    }
+  function report(result){
+    if(!playerName) return;
+    fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:playerName,result:result,difficulty:difficulty,streak:streak})
+    }).then(function(){ if(leaderboard.classList.contains('show')) loadLeaderboard(); }).catch(function(){});
+  }
+  function reportOnline(result){
+    if(!playerName) return;
+    fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:playerName,result:result})
+    }).then(function(){ if(leaderboard.classList.contains('show')) loadLeaderboard(); }).catch(function(){});
+  }
+  function loadLeaderboard(){
+    lbList.innerHTML='<div class="lb-loading">Loading…</div>';
+    fetch(LEADERBOARD_URL+'/scores').then(function(r){return r.json();}).then(function(data){
+      var players=(data&&data.players)||[];
+      if(!players.length){ lbList.innerHTML='<div class="lb-empty">No scores yet — be the first!</div>'; return; }
+      var html='';
+      players.slice(0,10).forEach(function(p,idx){
+        var medal=idx===0?'\uD83E\uDD47':idx===1?'\uD83E\uDD48':idx===2?'\uD83E\uDD49':(idx+1);
+        var sub='best streak '+(p.bestStreak||0)+' · E'+(p.easy||0)+' M'+(p.medium||0)+' H'+(p.hard||0);
+        html+='<div class="lb-row"><div class="lb-rank">'+medal+'</div>'+
+              '<div class="lb-name">'+escapeHtml(p.name||'?')+'</div>'+
+              '<div class="lb-wins">'+(p.wins||0)+' wins</div>'+
+              '<div class="lb-sub">'+sub+'</div></div>';
+      });
+      lbList.innerHTML=html;
+    }).catch(function(){ lbList.innerHTML='<div class="lb-empty">Could not load leaderboard.</div>'; });
+  }
+  lbToggle.addEventListener('click',function(){
+    var show=!leaderboard.classList.contains('show');
+    leaderboard.classList.toggle('show',show);
+    lbToggle.innerHTML=show?'&#127942; Hide leaderboard':'&#127942; Show leaderboard';
+    if(show) loadLeaderboard();
+  });
+
+  function randCode(){ var c='',a='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; for(var i=0;i<4;i++) c+=a[Math.floor(Math.random()*a.length)]; return c; }
+  function connect(code,asHost){
     room=code; myMark=asHost?'X':'O';
     var url='wss://'+PIESOCKET_CLUSTER+'.piesocket.com/v3/'+code+'?api_key='+PIESOCKET_API_KEY+'&notify_self=0';
     statusEl.textContent='Connecting…';
     try{ ws=new WebSocket(url); }catch(e){ statusEl.textContent='Connection failed'; return; }
     ws.onopen=function(){
-      onlineConnected=true;
-      panel.classList.remove('show');
+      onlineConnected=true; panel.classList.remove('show');
       var tag=document.createElement('div'); tag.className='room-tag'; tag.id='roomTag';
       tag.textContent='Room code: '+code+'   ·   you are '+myMark;
-      panel.parentNode.insertBefore(tag, statusEl);
+      panel.parentNode.insertBefore(tag,statusEl);
       newRound(false);
-      statusEl.textContent = asHost ? 'Share code '+code+' — waiting for friend…' : 'Joined! '+ (current===myMark?'Your turn':"Friend's turn");
+      statusEl.textContent=asHost?'Share code '+code+' — waiting for friend…':'Joined! '+(current===myMark?'Your turn':"Friend's turn");
       if(!asHost) sendMsg({t:'hello'});
     };
     ws.onmessage=function(ev){
@@ -290,30 +339,24 @@
       if(!data||!data.t) return;
       if(data.t==='hello'){ if(myMark==='X'){ sendMsg({t:'welcome'}); statusEl.textContent='Friend joined! Your turn'; render(); } return; }
       if(data.t==='welcome'){ statusEl.textContent="Friend's turn"; render(); return; }
-      if(data.t==='move'){
-        if(board[data.i]==='' && data.mark===current){
-          board[data.i]=data.mark;
-          if(finish()) return;
-          current=current==='X'?'O':'X';
-          render(); updateStatus();
-        }
-        return;
-      }
+      if(data.t==='move'){ if(board[data.i]===''&&data.mark===current){ board[data.i]=data.mark; if(finish()) return; current=current==='X'?'O':'X'; render(); updateStatus(); } return; }
       if(data.t==='reset'){ board=Array(9).fill(''); current='X'; over=false; render(); updateStatus(); return; }
     };
     ws.onclose=function(){ onlineConnected=false; if(mode==='online'){ statusEl.textContent='Disconnected. Create or join again.'; var rt=document.getElementById('roomTag'); if(rt) rt.remove(); panel.classList.add('show'); } };
-    ws.onerror=function(){ statusEl.textContent='Connection error — check your key/cluster'; };
+    ws.onerror=function(){ statusEl.textContent='Connection error — check your key'; };
   }
   function sendMsg(obj){ if(ws&&ws.readyState===1) ws.send(JSON.stringify(obj)); }
 
-  createBtn.addEventListener('click',function(){ connect(randCode(), true); });
-  joinBtn.addEventListener('click',function(){ var c=(joinCode.value||'').toUpperCase().trim(); if(c.length<4){ statusEl.textContent='Enter the 4-letter code'; return; } connect(c, false); });
-
+  createBtn.addEventListener('click',function(){ connect(randCode(),true); });
+  joinBtn.addEventListener('click',function(){ var c=(joinCode.value||'').toUpperCase().trim(); if(c.length<4){ statusEl.textContent='Enter the 4-letter code'; return; } connect(c,false); });
   m2p.addEventListener('click',function(){setMode('2p');});
   mcpu.addEventListener('click',function(){setMode('cpu');});
   mon.addEventListener('click',function(){setMode('online');});
   dbtns.forEach(function(b){ b.addEventListener('click',function(){ setDiff(b.getAttribute('data-d')); }); });
   resetBtn.addEventListener('click',function(){ newRound(true); });
+
+  renderWhoami();
+  if(!playerName) promptName();
   setMode('2p');
 })();
 </script>
