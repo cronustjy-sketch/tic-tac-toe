@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noughts & Crosses — a friendly game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#fdf6ec;
+    --paper:#fffaf3;
+    --ink:#3d3a35;
+    --soft:#8a8278;
+    --x:#e8843f;
+    --x-soft:#fbe5d4;
+    --o:#4a9d8e;
+    --o-soft:#d9efe9;
+    --line:#ece1d2;
+    --shadow:rgba(120,90,50,0.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:var(--cream);
+    background-image:radial-gradient(var(--line) 1.2px, transparent 1.2px);
+    background-size:26px 26px;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:2rem 1rem 3rem;
+  }
+  header{text-align:center;margin-bottom:1.75rem;animation:drop .7s ease both;}
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:900;
+    font-size:clamp(2.4rem,7vw,3.6rem);
+    line-height:1;
+    letter-spacing:-0.02em;
+  }
+  h1 .amp{color:var(--x);font-style:italic;}
+  .tagline{
+    color:var(--soft);
+    font-weight:600;
+    margin-top:.6rem;
+    font-size:1.05rem;
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--o-soft);color:var(--o);
+    font-weight:700;font-size:.8rem;
+    padding:5px 13px;border-radius:999px;margin-top:1rem;
+    letter-spacing:.02em;
+  }
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:28px;
+    padding:1.75rem;
+    box-shadow:0 18px 40px -20px var(--shadow);
+    width:100%;max-width:440px;
+    animation:drop .7s .1s ease both;
+  }
+  .modes{display:flex;gap:8px;background:var(--cream);padding:6px;border-radius:16px;margin-bottom:1.5rem;}
+  .mode{
+    flex:1;border:none;background:transparent;cursor:pointer;
+    font-family:inherit;font-weight:800;font-size:.95rem;color:var(--soft);
+    padding:11px;border-radius:11px;transition:.25s;
+  }
+  .mode.active{background:var(--paper);color:var(--ink);box-shadow:0 4px 12px -6px var(--shadow);}
+  .status{
+    text-align:center;font-family:'Fraunces',serif;font-weight:600;
+    font-size:1.45rem;min-height:2rem;margin-bottom:1.25rem;transition:.2s;
+  }
+  .board{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem;}
+  .cell{
+    aspect-ratio:1;border:none;cursor:pointer;
+    background:var(--cream);border-radius:20px;
+    font-family:'Fraunces',serif;font-weight:900;
+    font-size:clamp(2.5rem,12vw,3.4rem);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .12s, background .2s;
+    color:var(--ink);
+  }
+  .cell:hover:not(.taken){background:#fbf1e2;transform:translateY(-2px);}
+  .cell:active{transform:scale(.95);}
+  .cell.x{color:var(--x);}
+  .cell.o{color:var(--o);}
+  .cell.win{background:var(--x-soft);animation:pop .4s ease;}
+  .cell.win.o{background:var(--o-soft);}
+  .mark{display:inline-block;animation:pop .3s ease;}
+  .scores{display:flex;gap:10px;margin-bottom:1.25rem;}
+  .score{flex:1;text-align:center;background:var(--cream);border-radius:16px;padding:.9rem;}
+  .score .lbl{font-size:.8rem;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;}
+  .score .val{font-family:'Fraunces',serif;font-weight:900;font-size:1.9rem;margin-top:2px;}
+  .score.x .val{color:var(--x);}
+  .score.o .val{color:var(--o);}
+  .reset{
+    width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:1rem;
+    background:var(--ink);color:var(--paper);padding:14px;border-radius:16px;transition:.2s;
+  }
+  .reset:hover{transform:translateY(-2px);box-shadow:0 12px 24px -12px var(--shadow);}
+  .reset:active{transform:scale(.98);}
+  footer{margin-top:2rem;color:var(--soft);font-weight:600;font-size:.85rem;text-align:center;}
+  @keyframes drop{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+  @keyframes pop{0%{transform:scale(.3);opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
+</style>
+</head>
+<body>
+  <header>
+    <h1>Noughts <span class="amp">&amp;</span> Crosses</h1>
+    <p class="tagline">A warm little game for two. No ads, ever.</p>
+    <span class="badge">&#9829; 100% free &amp; ad-free</span>
+  </header>
+
+  <main class="card">
+    <div class="modes">
+      <button class="mode active" id="mode-2p">Two players</button>
+      <button class="mode" id="mode-cpu">vs Computer</button>
+    </div>
+
+    <div class="status" id="status">Player X's turn</div>
+
+    <div class="board" id="board"></div>
+
+    <div class="scores">
+      <div class="score x"><div class="lbl">X wins</div><div class="val" id="sx">0</div></div>
+      <div class="score"><div class="lbl">Draws</div><div class="val" id="sd">0</div></div>
+      <div class="score o"><div class="lbl">O wins</div><div class="val" id="so">0</div></div>
+    </div>
+
+    <button class="reset" id="reset">New round</button>
+  </main>
+
+  <footer>Made to be kind. Take turns, have fun. &#10022;</footer>
+
+<script>
+(function(){
+  const boardEl=document.getElementById('board');
+  const statusEl=document.getElementById('status');
+  const resetBtn=document.getElementById('reset');
+  const m2p=document.getElementById('mode-2p');
+  const mcpu=document.getElementById('mode-cpu');
+  const sx=document.getElementById('sx'),so=document.getElementById('so'),sd=document.getElementById('sd');
+
+  let board=Array(9).fill('');
+  let current='X', over=false, vsCpu=false;
+  let scores={X:0,O:0,D:0};
+  const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+  function setMode(cpu){
+    vsCpu=cpu;
+    m2p.classList.toggle('active',!cpu);
+    mcpu.classList.toggle('active',cpu);
+    newRound();
+  }
+  function newRound(){
+    board=Array(9).fill(''); current='X'; over=false;
+    render(); updateStatus();
+  }
+  function render(winLine){
+    boardEl.innerHTML='';
+    board.forEach(function(v,i){
+      const c=document.createElement('button');
+      c.className='cell'+(v?' taken '+v.toLowerCase():'');
+      if(winLine&&winLine.indexOf(i)!==-1) c.className+=' win '+v.toLowerCase();
+      if(v) c.innerHTML='<span class="mark">'+v+'</span>';
+      c.addEventListener('click',function(){play(i);});
+      boardEl.appendChild(c);
+    });
+  }
+  function updateStatus(){
+    statusEl.textContent=(vsCpu&&current==='O')?"Computer's turn":"Player "+current+"'s turn";
+  }
+  function winningLine(p){
+    for(var k=0;k<wins.length;k++){
+      var line=wins[k];
+      if(line.every(function(i){return board[i]===p;})) return line;
+    }
+    return null;
+  }
+  function play(i){
+    if(over||board[i]!=='') return;
+    if(vsCpu&&current==='O') return;
+    board[i]=current;
+    if(finish()) return;
+    current=current==='X'?'O':'X';
+    render(); updateStatus();
+    if(vsCpu&&current==='O'&&!over){
+      statusEl.textContent='Computer thinking…';
+      setTimeout(cpuMove,500);
+    }
+  }
+  function finish(){
+    var line=winningLine(current);
+    if(line){
+      over=true; scores[current]++;
+      sx.textContent=scores.X; so.textContent=scores.O; sd.textContent=scores.D;
+      render(line);
+      statusEl.textContent=(vsCpu&&current==='O'?'Computer':'Player '+current)+' wins! 🎉';
+      return true;
+    }
+    if(board.every(function(c){return c!=='';})){
+      over=true; scores.D++; sd.textContent=scores.D;
+      render();
+      statusEl.textContent="It's a draw! 🤝";
+      return true;
+    }
+    return false;
+  }
+  function cpuMove(){
+    var empty=board.map(function(v,i){return v===''?i:null;}).filter(function(x){return x!==null;});
+    var move=findBest('O');
+    if(move===null) move=findBest('X');
+    if(move===null&&empty.indexOf(4)!==-1) move=4;
+    if(move===null) move=empty[Math.floor(Math.random()*empty.length)];
+    board[move]='O';
+    if(finish()) return;
+    current='X'; render(); updateStatus();
+  }
+  function findBest(p){
+    for(var k=0;k<wins.length;k++){
+      var line=wins[k];
+      var vals=line.map(function(i){return board[i];});
+      if(vals.filter(function(v){return v===p;}).length===2&&vals.indexOf('')!==-1) return line[vals.indexOf('')];
+    }
+    return null;
+  }
+
+  m2p.addEventListener('click',function(){setMode(false);});
+  mcpu.addEventListener('click',function(){setMode(true);});
+  resetBtn.addEventListener('click',newRound);
+  setMode(false);
+})();
+</script>
+</body>
+</html>
