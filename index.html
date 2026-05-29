@@ -14,30 +14,33 @@
     --line:#ece1d2; --shadow:rgba(120,90,50,0.12);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{
-    font-family:'Nunito',sans-serif;
-    background:var(--cream);
-    background-image:radial-gradient(var(--line) 1.2px, transparent 1.2px);
-    background-size:26px 26px;
-    color:var(--ink); min-height:100vh;
-    display:flex; flex-direction:column; align-items:center;
-    padding:2rem 1rem 3rem;
-  }
+  body{font-family:'Nunito',sans-serif;background:var(--cream);background-image:radial-gradient(var(--line) 1.2px, transparent 1.2px);background-size:26px 26px;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 3rem;}
   header{text-align:center;margin-bottom:1.5rem;animation:drop .7s ease both;}
   h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.4rem,7vw,3.6rem);line-height:1;letter-spacing:-0.02em;}
   h1 .amp{color:var(--x);font-style:italic;}
   .tagline{color:var(--soft);font-weight:600;margin-top:.6rem;font-size:1.05rem;}
   .badge{display:inline-flex;align-items:center;gap:6px;background:var(--o-soft);color:var(--o);font-weight:700;font-size:.8rem;padding:5px 13px;border-radius:999px;margin-top:1rem;letter-spacing:.02em;}
   .card{background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:1.75rem;box-shadow:0 18px 40px -20px var(--shadow);width:100%;max-width:440px;animation:drop .7s .1s ease both;}
-  .modes{display:flex;gap:8px;background:var(--cream);padding:6px;border-radius:16px;margin-bottom:1rem;}
-  .mode{flex:1;border:none;background:transparent;cursor:pointer;font-family:inherit;font-weight:800;font-size:.95rem;color:var(--soft);padding:11px;border-radius:11px;transition:.25s;}
+  .modes{display:flex;gap:6px;background:var(--cream);padding:6px;border-radius:16px;margin-bottom:1rem;}
+  .mode{flex:1;border:none;background:transparent;cursor:pointer;font-family:inherit;font-weight:800;font-size:.85rem;color:var(--soft);padding:11px 4px;border-radius:11px;transition:.25s;}
   .mode.active{background:var(--paper);color:var(--ink);box-shadow:0 4px 12px -6px var(--shadow);}
-  .diff{display:flex;gap:8px;margin-bottom:1.25rem;overflow:hidden;transition:.3s;}
+  .diff{display:flex;gap:8px;margin-bottom:1.25rem;}
   .diff.hidden{display:none;}
   .dbtn{flex:1;border:1px solid var(--line);background:var(--cream);cursor:pointer;font-family:inherit;font-weight:700;font-size:.85rem;color:var(--soft);padding:9px;border-radius:12px;transition:.2s;}
   .dbtn.active{background:var(--x-soft);color:var(--x);border-color:var(--x);}
-  .status{text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:1.45rem;min-height:2rem;margin-bottom:1.25rem;transition:.2s;}
+  .online-panel{display:none;flex-direction:column;gap:10px;margin-bottom:1.25rem;}
+  .online-panel.show{display:flex;}
+  .online-panel input{font-family:inherit;font-size:1rem;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.15em;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream);color:var(--ink);}
+  .online-panel input:focus{outline:none;border-color:var(--x);}
+  .obtn{border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:.95rem;padding:12px;border-radius:12px;transition:.2s;}
+  .obtn.primary{background:var(--x);color:#fff;}
+  .obtn.secondary{background:var(--cream);color:var(--ink);border:1px solid var(--line);}
+  .obtn:active{transform:scale(.98);}
+  .room-tag{text-align:center;font-weight:800;color:var(--o);background:var(--o-soft);padding:8px;border-radius:10px;font-size:.9rem;letter-spacing:.1em;}
+  .or{text-align:center;color:var(--soft);font-weight:700;font-size:.8rem;}
+  .status{text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:1.4rem;min-height:2rem;margin-bottom:1.25rem;transition:.2s;}
   .board{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem;}
+  .board.locked{opacity:.55;pointer-events:none;}
   .cell{aspect-ratio:1;border:none;cursor:pointer;background:var(--cream);border-radius:20px;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.5rem,12vw,3.4rem);display:flex;align-items:center;justify-content:center;transition:transform .12s,background .2s;color:var(--ink);}
   .cell:hover:not(.taken){background:#fbf1e2;transform:translateY(-2px);}
   .cell:active{transform:scale(.95);}
@@ -71,12 +74,20 @@
     <div class="modes">
       <button class="mode active" id="mode-2p">Two players</button>
       <button class="mode" id="mode-cpu">vs Computer</button>
+      <button class="mode" id="mode-online">Play online</button>
     </div>
 
     <div class="diff hidden" id="diff">
       <button class="dbtn active" data-d="easy">Easy</button>
       <button class="dbtn" data-d="medium">Medium</button>
       <button class="dbtn" data-d="hard">Hard</button>
+    </div>
+
+    <div class="online-panel" id="onlinePanel">
+      <button class="obtn primary" id="createBtn">Create a room</button>
+      <div class="or">— or join a friend —</div>
+      <input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off">
+      <button class="obtn secondary" id="joinBtn">Join room</button>
     </div>
 
     <div class="status" id="status">Player X's turn</div>
@@ -95,25 +106,41 @@
 
 <script>
 (function(){
+  // ====== PASTE YOUR PIESOCKET API KEY BELOW (between the quotes) ======
+  var PIESOCKET_API_KEY = "OsYl4zuI9ZrFa1i71JGUgXfIr0gyo4YtB1JXf5lr";
+  var PIESOCKET_CLUSTER = "free.blr2"; // PieSocket free cluster; update if yours differs
+  // =====================================================================
+
   var boardEl=document.getElementById('board');
   var statusEl=document.getElementById('status');
   var resetBtn=document.getElementById('reset');
   var m2p=document.getElementById('mode-2p');
   var mcpu=document.getElementById('mode-cpu');
+  var mon=document.getElementById('mode-online');
   var diffEl=document.getElementById('diff');
   var dbtns=diffEl.querySelectorAll('.dbtn');
+  var panel=document.getElementById('onlinePanel');
+  var createBtn=document.getElementById('createBtn');
+  var joinBtn=document.getElementById('joinBtn');
+  var joinCode=document.getElementById('joinCode');
   var sx=document.getElementById('sx'),so=document.getElementById('so'),sd=document.getElementById('sd');
 
   var board=Array(9).fill('');
-  var current='X', over=false, vsCpu=false, difficulty='easy';
-  var scores={X:0,O:0,D:0};
+  var current='X', over=false, scores={X:0,O:0,D:0};
+  var mode='2p', difficulty='easy';
   var wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-  function setMode(cpu){
-    vsCpu=cpu;
-    m2p.classList.toggle('active',!cpu);
-    mcpu.classList.toggle('active',cpu);
-    diffEl.classList.toggle('hidden',!cpu);
+  // online state
+  var ws=null, room=null, myMark=null, onlineConnected=false;
+
+  function setMode(m){
+    mode=m;
+    m2p.classList.toggle('active',m==='2p');
+    mcpu.classList.toggle('active',m==='cpu');
+    mon.classList.toggle('active',m==='online');
+    diffEl.classList.toggle('hidden',m!=='cpu');
+    panel.classList.toggle('show',m==='online');
+    if(ws){ try{ws.close();}catch(e){} ws=null; onlineConnected=false; }
     newRound();
   }
   function setDiff(d){
@@ -121,12 +148,15 @@
     dbtns.forEach(function(b){b.classList.toggle('active',b.getAttribute('data-d')===d);});
     newRound();
   }
-  function newRound(){
+  function newRound(sendSync){
     board=Array(9).fill(''); current='X'; over=false;
     render(); updateStatus();
+    if(mode==='online'&&onlineConnected&&sendSync){ sendMsg({t:'reset'}); }
   }
   function render(winLine){
     boardEl.innerHTML='';
+    var lock = (mode==='online') && (!onlineConnected || current!==myMark || over);
+    boardEl.classList.toggle('locked', lock && !over ? true : false);
     board.forEach(function(v,i){
       var c=document.createElement('button');
       c.className='cell'+(v?' taken '+v.toLowerCase():'');
@@ -137,23 +167,38 @@
     });
   }
   function updateStatus(){
-    statusEl.textContent=(vsCpu&&current==='O')?"Computer's turn":"Player "+current+"'s turn";
+    if(mode==='online'){
+      if(!onlineConnected){ statusEl.textContent='Create or join a room to start'; return; }
+      if(over) return;
+      statusEl.textContent = (current===myMark) ? "Your turn ("+myMark+")" : "Friend's turn ("+current+")";
+      return;
+    }
+    if(mode==='cpu'&&current==='O'){ statusEl.textContent="Computer's turn"; return; }
+    statusEl.textContent="Player "+current+"'s turn";
   }
   function winningLine(b,p){
-    for(var k=0;k<wins.length;k++){
-      var line=wins[k];
-      if(line.every(function(i){return b[i]===p;})) return line;
-    }
+    for(var k=0;k<wins.length;k++){ if(wins[k].every(function(i){return b[i]===p;})) return wins[k]; }
     return null;
   }
+  function emptyCells(b){ var e=[]; for(var i=0;i<9;i++) if(b[i]==='') e.push(i); return e; }
+
   function play(i){
     if(over||board[i]!=='') return;
-    if(vsCpu&&current==='O') return;
+    if(mode==='cpu'&&current==='O') return;
+    if(mode==='online'){
+      if(!onlineConnected||current!==myMark) return;
+      board[i]=current;
+      sendMsg({t:'move',i:i,mark:current});
+      if(finish()) return;
+      current=current==='X'?'O':'X';
+      render(); updateStatus();
+      return;
+    }
     board[i]=current;
     if(finish()) return;
     current=current==='X'?'O':'X';
     render(); updateStatus();
-    if(vsCpu&&current==='O'&&!over){
+    if(mode==='cpu'&&current==='O'&&!over){
       statusEl.textContent='Computer thinking…';
       setTimeout(cpuMove,450);
     }
@@ -164,7 +209,11 @@
       over=true; scores[current]++;
       sx.textContent=scores.X; so.textContent=scores.O; sd.textContent=scores.D;
       render(line);
-      statusEl.textContent=(vsCpu&&current==='O'?'Computer':'Player '+current)+' wins! \uD83C\uDF89';
+      var who;
+      if(mode==='online') who = (current===myMark?'You win!':'Friend wins!');
+      else if(mode==='cpu'&&current==='O') who='Computer wins!';
+      else who='Player '+current+' wins!';
+      statusEl.textContent=who+' \uD83C\uDF89';
       return true;
     }
     if(board.every(function(c){return c!=='';})){
@@ -175,49 +224,37 @@
     }
     return false;
   }
-  function emptyCells(b){
-    var e=[]; for(var i=0;i<9;i++){ if(b[i]==='') e.push(i);} return e;
-  }
-  function tacticalMove(){
-    var w=findTwo('O'); if(w!==null) return w;
-    var blk=findTwo('X'); if(blk!==null) return blk;
-    if(board[4]==='') return 4;
-    return null;
-  }
+
+  // ---- AI ----
   function findTwo(p){
     for(var k=0;k<wins.length;k++){
-      var line=wins[k];
-      var vals=line.map(function(i){return board[i];});
-      if(vals.filter(function(v){return v===p;}).length===2&&vals.indexOf('')!==-1) return line[vals.indexOf('')];
+      var ln=wins[k], vv=ln.map(function(i){return board[i];});
+      if(vv.filter(function(x){return x===p;}).length===2&&vv.indexOf('')!==-1) return ln[vv.indexOf('')];
     }
     return null;
   }
+  function tacticalMove(){ var w=findTwo('O'); if(w!==null) return w; var b=findTwo('X'); if(b!==null) return b; if(board[4]==='') return 4; return null; }
   function minimax(b,player){
-    var oWin=winningLine(b,'O'), xWin=winningLine(b,'X');
-    if(oWin) return {score:10};
-    if(xWin) return {score:-10};
-    var avail=emptyCells(b);
-    if(avail.length===0) return {score:0};
+    if(winningLine(b,'O')) return {score:10};
+    if(winningLine(b,'X')) return {score:-10};
+    var avail=emptyCells(b); if(avail.length===0) return {score:0};
     var best=(player==='O')?{score:-999}:{score:999};
     for(var n=0;n<avail.length;n++){
-      var idx=avail[n];
-      b[idx]=player;
-      var result=minimax(b,player==='O'?'X':'O');
-      b[idx]='';
-      if(player==='O'){ if(result.score>best.score) best={score:result.score,move:idx}; }
-      else{ if(result.score<best.score) best={score:result.score,move:idx}; }
+      var idx=avail[n]; b[idx]=player;
+      var r=minimax(b,player==='O'?'X':'O'); b[idx]='';
+      if(player==='O'){ if(r.score>best.score) best={score:r.score,move:idx}; }
+      else{ if(r.score<best.score) best={score:r.score,move:idx}; }
     }
     return best;
   }
   function cpuMove(){
-    var empty=emptyCells(board);
-    var move;
+    var empty=emptyCells(board), move;
     if(difficulty==='easy'){
-      if(Math.random()<0.7){ move=empty[Math.floor(Math.random()*empty.length)]; }
+      if(Math.random()<0.7) move=empty[Math.floor(Math.random()*empty.length)];
       else{ move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; }
     } else if(difficulty==='medium'){
       if(Math.random()<0.8){ move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; }
-      else{ move=empty[Math.floor(Math.random()*empty.length)]; }
+      else move=empty[Math.floor(Math.random()*empty.length)];
     } else {
       move=minimax(board.slice(),'O').move;
       if(move===undefined||move===null) move=empty[Math.floor(Math.random()*empty.length)];
@@ -227,11 +264,57 @@
     current='X'; render(); updateStatus();
   }
 
-  m2p.addEventListener('click',function(){setMode(false);});
-  mcpu.addEventListener('click',function(){setMode(true);});
+  // ---- ONLINE (PieSocket) ----
+  function randCode(){ var c='', a='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; for(var i=0;i<4;i++) c+=a[Math.floor(Math.random()*a.length)]; return c; }
+  function connect(code, asHost){
+    if(PIESOCKET_API_KEY==='PASTE_YOUR_KEY_HERE'){
+      statusEl.textContent='Add your PieSocket key first';
+      return;
+    }
+    room=code; myMark=asHost?'X':'O';
+    var url='wss://'+PIESOCKET_CLUSTER+'.piesocket.com/v3/'+code+'?api_key='+PIESOCKET_API_KEY+'&notify_self=0';
+    statusEl.textContent='Connecting…';
+    try{ ws=new WebSocket(url); }catch(e){ statusEl.textContent='Connection failed'; return; }
+    ws.onopen=function(){
+      onlineConnected=true;
+      panel.classList.remove('show');
+      var tag=document.createElement('div'); tag.className='room-tag'; tag.id='roomTag';
+      tag.textContent='Room code: '+code+'   ·   you are '+myMark;
+      panel.parentNode.insertBefore(tag, statusEl);
+      newRound(false);
+      statusEl.textContent = asHost ? 'Share code '+code+' — waiting for friend…' : 'Joined! '+ (current===myMark?'Your turn':"Friend's turn");
+      if(!asHost) sendMsg({t:'hello'});
+    };
+    ws.onmessage=function(ev){
+      var data; try{ data=JSON.parse(ev.data); }catch(e){ return; }
+      if(!data||!data.t) return;
+      if(data.t==='hello'){ if(myMark==='X'){ sendMsg({t:'welcome'}); statusEl.textContent='Friend joined! Your turn'; render(); } return; }
+      if(data.t==='welcome'){ statusEl.textContent="Friend's turn"; render(); return; }
+      if(data.t==='move'){
+        if(board[data.i]==='' && data.mark===current){
+          board[data.i]=data.mark;
+          if(finish()) return;
+          current=current==='X'?'O':'X';
+          render(); updateStatus();
+        }
+        return;
+      }
+      if(data.t==='reset'){ board=Array(9).fill(''); current='X'; over=false; render(); updateStatus(); return; }
+    };
+    ws.onclose=function(){ onlineConnected=false; if(mode==='online'){ statusEl.textContent='Disconnected. Create or join again.'; var rt=document.getElementById('roomTag'); if(rt) rt.remove(); panel.classList.add('show'); } };
+    ws.onerror=function(){ statusEl.textContent='Connection error — check your key/cluster'; };
+  }
+  function sendMsg(obj){ if(ws&&ws.readyState===1) ws.send(JSON.stringify(obj)); }
+
+  createBtn.addEventListener('click',function(){ connect(randCode(), true); });
+  joinBtn.addEventListener('click',function(){ var c=(joinCode.value||'').toUpperCase().trim(); if(c.length<4){ statusEl.textContent='Enter the 4-letter code'; return; } connect(c, false); });
+
+  m2p.addEventListener('click',function(){setMode('2p');});
+  mcpu.addEventListener('click',function(){setMode('cpu');});
+  mon.addEventListener('click',function(){setMode('online');});
   dbtns.forEach(function(b){ b.addEventListener('click',function(){ setDiff(b.getAttribute('data-d')); }); });
-  resetBtn.addEventListener('click',newRound);
-  setMode(false);
+  resetBtn.addEventListener('click',function(){ newRound(true); });
+  setMode('2p');
 })();
 </script>
 </body>
