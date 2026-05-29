@@ -9,16 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --cream:#fdf6ec;
-    --paper:#fffaf3;
-    --ink:#3d3a35;
-    --soft:#8a8278;
-    --x:#e8843f;
-    --x-soft:#fbe5d4;
-    --o:#4a9d8e;
-    --o-soft:#d9efe9;
-    --line:#ece1d2;
-    --shadow:rgba(120,90,50,0.12);
+    --cream:#fdf6ec; --paper:#fffaf3; --ink:#3d3a35; --soft:#8a8278;
+    --x:#e8843f; --x-soft:#fbe5d4; --o:#4a9d8e; --o-soft:#d9efe9;
+    --line:#ece1d2; --shadow:rgba(120,90,50,0.12);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{
@@ -26,65 +19,26 @@
     background:var(--cream);
     background-image:radial-gradient(var(--line) 1.2px, transparent 1.2px);
     background-size:26px 26px;
-    color:var(--ink);
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
+    color:var(--ink); min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
     padding:2rem 1rem 3rem;
   }
-  header{text-align:center;margin-bottom:1.75rem;animation:drop .7s ease both;}
-  h1{
-    font-family:'Fraunces',serif;
-    font-weight:900;
-    font-size:clamp(2.4rem,7vw,3.6rem);
-    line-height:1;
-    letter-spacing:-0.02em;
-  }
+  header{text-align:center;margin-bottom:1.5rem;animation:drop .7s ease both;}
+  h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.4rem,7vw,3.6rem);line-height:1;letter-spacing:-0.02em;}
   h1 .amp{color:var(--x);font-style:italic;}
-  .tagline{
-    color:var(--soft);
-    font-weight:600;
-    margin-top:.6rem;
-    font-size:1.05rem;
-  }
-  .badge{
-    display:inline-flex;align-items:center;gap:6px;
-    background:var(--o-soft);color:var(--o);
-    font-weight:700;font-size:.8rem;
-    padding:5px 13px;border-radius:999px;margin-top:1rem;
-    letter-spacing:.02em;
-  }
-  .card{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:28px;
-    padding:1.75rem;
-    box-shadow:0 18px 40px -20px var(--shadow);
-    width:100%;max-width:440px;
-    animation:drop .7s .1s ease both;
-  }
-  .modes{display:flex;gap:8px;background:var(--cream);padding:6px;border-radius:16px;margin-bottom:1.5rem;}
-  .mode{
-    flex:1;border:none;background:transparent;cursor:pointer;
-    font-family:inherit;font-weight:800;font-size:.95rem;color:var(--soft);
-    padding:11px;border-radius:11px;transition:.25s;
-  }
+  .tagline{color:var(--soft);font-weight:600;margin-top:.6rem;font-size:1.05rem;}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--o-soft);color:var(--o);font-weight:700;font-size:.8rem;padding:5px 13px;border-radius:999px;margin-top:1rem;letter-spacing:.02em;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:1.75rem;box-shadow:0 18px 40px -20px var(--shadow);width:100%;max-width:440px;animation:drop .7s .1s ease both;}
+  .modes{display:flex;gap:8px;background:var(--cream);padding:6px;border-radius:16px;margin-bottom:1rem;}
+  .mode{flex:1;border:none;background:transparent;cursor:pointer;font-family:inherit;font-weight:800;font-size:.95rem;color:var(--soft);padding:11px;border-radius:11px;transition:.25s;}
   .mode.active{background:var(--paper);color:var(--ink);box-shadow:0 4px 12px -6px var(--shadow);}
-  .status{
-    text-align:center;font-family:'Fraunces',serif;font-weight:600;
-    font-size:1.45rem;min-height:2rem;margin-bottom:1.25rem;transition:.2s;
-  }
+  .diff{display:flex;gap:8px;margin-bottom:1.25rem;overflow:hidden;transition:.3s;}
+  .diff.hidden{display:none;}
+  .dbtn{flex:1;border:1px solid var(--line);background:var(--cream);cursor:pointer;font-family:inherit;font-weight:700;font-size:.85rem;color:var(--soft);padding:9px;border-radius:12px;transition:.2s;}
+  .dbtn.active{background:var(--x-soft);color:var(--x);border-color:var(--x);}
+  .status{text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:1.45rem;min-height:2rem;margin-bottom:1.25rem;transition:.2s;}
   .board{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem;}
-  .cell{
-    aspect-ratio:1;border:none;cursor:pointer;
-    background:var(--cream);border-radius:20px;
-    font-family:'Fraunces',serif;font-weight:900;
-    font-size:clamp(2.5rem,12vw,3.4rem);
-    display:flex;align-items:center;justify-content:center;
-    transition:transform .12s, background .2s;
-    color:var(--ink);
-  }
+  .cell{aspect-ratio:1;border:none;cursor:pointer;background:var(--cream);border-radius:20px;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.5rem,12vw,3.4rem);display:flex;align-items:center;justify-content:center;transition:transform .12s,background .2s;color:var(--ink);}
   .cell:hover:not(.taken){background:#fbf1e2;transform:translateY(-2px);}
   .cell:active{transform:scale(.95);}
   .cell.x{color:var(--x);}
@@ -98,10 +52,7 @@
   .score .val{font-family:'Fraunces',serif;font-weight:900;font-size:1.9rem;margin-top:2px;}
   .score.x .val{color:var(--x);}
   .score.o .val{color:var(--o);}
-  .reset{
-    width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:1rem;
-    background:var(--ink);color:var(--paper);padding:14px;border-radius:16px;transition:.2s;
-  }
+  .reset{width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:1rem;background:var(--ink);color:var(--paper);padding:14px;border-radius:16px;transition:.2s;}
   .reset:hover{transform:translateY(-2px);box-shadow:0 12px 24px -12px var(--shadow);}
   .reset:active{transform:scale(.98);}
   footer{margin-top:2rem;color:var(--soft);font-weight:600;font-size:.85rem;text-align:center;}
@@ -122,8 +73,13 @@
       <button class="mode" id="mode-cpu">vs Computer</button>
     </div>
 
-    <div class="status" id="status">Player X's turn</div>
+    <div class="diff hidden" id="diff">
+      <button class="dbtn active" data-d="easy">Easy</button>
+      <button class="dbtn" data-d="medium">Medium</button>
+      <button class="dbtn" data-d="hard">Hard</button>
+    </div>
 
+    <div class="status" id="status">Player X's turn</div>
     <div class="board" id="board"></div>
 
     <div class="scores">
@@ -139,22 +95,30 @@
 
 <script>
 (function(){
-  const boardEl=document.getElementById('board');
-  const statusEl=document.getElementById('status');
-  const resetBtn=document.getElementById('reset');
-  const m2p=document.getElementById('mode-2p');
-  const mcpu=document.getElementById('mode-cpu');
-  const sx=document.getElementById('sx'),so=document.getElementById('so'),sd=document.getElementById('sd');
+  var boardEl=document.getElementById('board');
+  var statusEl=document.getElementById('status');
+  var resetBtn=document.getElementById('reset');
+  var m2p=document.getElementById('mode-2p');
+  var mcpu=document.getElementById('mode-cpu');
+  var diffEl=document.getElementById('diff');
+  var dbtns=diffEl.querySelectorAll('.dbtn');
+  var sx=document.getElementById('sx'),so=document.getElementById('so'),sd=document.getElementById('sd');
 
-  let board=Array(9).fill('');
-  let current='X', over=false, vsCpu=false;
-  let scores={X:0,O:0,D:0};
-  const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  var board=Array(9).fill('');
+  var current='X', over=false, vsCpu=false, difficulty='easy';
+  var scores={X:0,O:0,D:0};
+  var wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
   function setMode(cpu){
     vsCpu=cpu;
     m2p.classList.toggle('active',!cpu);
     mcpu.classList.toggle('active',cpu);
+    diffEl.classList.toggle('hidden',!cpu);
+    newRound();
+  }
+  function setDiff(d){
+    difficulty=d;
+    dbtns.forEach(function(b){b.classList.toggle('active',b.getAttribute('data-d')===d);});
     newRound();
   }
   function newRound(){
@@ -164,7 +128,7 @@
   function render(winLine){
     boardEl.innerHTML='';
     board.forEach(function(v,i){
-      const c=document.createElement('button');
+      var c=document.createElement('button');
       c.className='cell'+(v?' taken '+v.toLowerCase():'');
       if(winLine&&winLine.indexOf(i)!==-1) c.className+=' win '+v.toLowerCase();
       if(v) c.innerHTML='<span class="mark">'+v+'</span>';
@@ -175,10 +139,10 @@
   function updateStatus(){
     statusEl.textContent=(vsCpu&&current==='O')?"Computer's turn":"Player "+current+"'s turn";
   }
-  function winningLine(p){
+  function winningLine(b,p){
     for(var k=0;k<wins.length;k++){
       var line=wins[k];
-      if(line.every(function(i){return board[i]===p;})) return line;
+      if(line.every(function(i){return b[i]===p;})) return line;
     }
     return null;
   }
@@ -191,37 +155,36 @@
     render(); updateStatus();
     if(vsCpu&&current==='O'&&!over){
       statusEl.textContent='Computer thinking…';
-      setTimeout(cpuMove,500);
+      setTimeout(cpuMove,450);
     }
   }
   function finish(){
-    var line=winningLine(current);
+    var line=winningLine(board,current);
     if(line){
       over=true; scores[current]++;
       sx.textContent=scores.X; so.textContent=scores.O; sd.textContent=scores.D;
       render(line);
-      statusEl.textContent=(vsCpu&&current==='O'?'Computer':'Player '+current)+' wins! 🎉';
+      statusEl.textContent=(vsCpu&&current==='O'?'Computer':'Player '+current)+' wins! \uD83C\uDF89';
       return true;
     }
     if(board.every(function(c){return c!=='';})){
       over=true; scores.D++; sd.textContent=scores.D;
       render();
-      statusEl.textContent="It's a draw! 🤝";
+      statusEl.textContent="It's a draw! \uD83E\uDD1D";
       return true;
     }
     return false;
   }
-  function cpuMove(){
-    var empty=board.map(function(v,i){return v===''?i:null;}).filter(function(x){return x!==null;});
-    var move=findBest('O');
-    if(move===null) move=findBest('X');
-    if(move===null&&empty.indexOf(4)!==-1) move=4;
-    if(move===null) move=empty[Math.floor(Math.random()*empty.length)];
-    board[move]='O';
-    if(finish()) return;
-    current='X'; render(); updateStatus();
+  function emptyCells(b){
+    var e=[]; for(var i=0;i<9;i++){ if(b[i]==='') e.push(i);} return e;
   }
-  function findBest(p){
+  function tacticalMove(){
+    var w=findTwo('O'); if(w!==null) return w;
+    var blk=findTwo('X'); if(blk!==null) return blk;
+    if(board[4]==='') return 4;
+    return null;
+  }
+  function findTwo(p){
     for(var k=0;k<wins.length;k++){
       var line=wins[k];
       var vals=line.map(function(i){return board[i];});
@@ -229,9 +192,44 @@
     }
     return null;
   }
+  function minimax(b,player){
+    var oWin=winningLine(b,'O'), xWin=winningLine(b,'X');
+    if(oWin) return {score:10};
+    if(xWin) return {score:-10};
+    var avail=emptyCells(b);
+    if(avail.length===0) return {score:0};
+    var best=(player==='O')?{score:-999}:{score:999};
+    for(var n=0;n<avail.length;n++){
+      var idx=avail[n];
+      b[idx]=player;
+      var result=minimax(b,player==='O'?'X':'O');
+      b[idx]='';
+      if(player==='O'){ if(result.score>best.score) best={score:result.score,move:idx}; }
+      else{ if(result.score<best.score) best={score:result.score,move:idx}; }
+    }
+    return best;
+  }
+  function cpuMove(){
+    var empty=emptyCells(board);
+    var move;
+    if(difficulty==='easy'){
+      if(Math.random()<0.7){ move=empty[Math.floor(Math.random()*empty.length)]; }
+      else{ move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; }
+    } else if(difficulty==='medium'){
+      if(Math.random()<0.8){ move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; }
+      else{ move=empty[Math.floor(Math.random()*empty.length)]; }
+    } else {
+      move=minimax(board.slice(),'O').move;
+      if(move===undefined||move===null) move=empty[Math.floor(Math.random()*empty.length)];
+    }
+    board[move]='O';
+    if(finish()) return;
+    current='X'; render(); updateStatus();
+  }
 
   m2p.addEventListener('click',function(){setMode(false);});
   mcpu.addEventListener('click',function(){setMode(true);});
+  dbtns.forEach(function(b){ b.addEventListener('click',function(){ setDiff(b.getAttribute('data-d')); }); });
   resetBtn.addEventListener('click',newRound);
   setMode(false);
 })();
