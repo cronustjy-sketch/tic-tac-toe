@@ -3,108 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noughts & Crosses — a friendly, ad-free tic-tac-toe game</title>
-<meta name="description" content="Play Noughts & Crosses (tic-tac-toe) free with no ads. Two players, three computer difficulties, online multiplayer with room codes, and a global leaderboard.">
-<meta name="keywords" content="tic-tac-toe, noughts and crosses, free game, no ads, online multiplayer, leaderboard">
+<title>Cronus Games — friendly, ad-free games</title>
+<meta name="description" content="A small collection of free, ad-free games: tic-tac-toe (with online play), Connect 4, Rock Paper Scissors and Memory. Play a friend or the computer, climb the leaderboard.">
 <link rel="canonical" href="https://game.cronuschores.xyz/">
-<meta property="og:title" content="Noughts & Crosses — a friendly, ad-free game">
-<meta property="og:description" content="Free tic-tac-toe with no ads. Play a friend, beat the computer, climb the global leaderboard.">
-<meta property="og:type" content="website">
+<meta property="og:title" content="Cronus Games — friendly, ad-free games">
+<meta property="og:description" content="Free games, no ads. Tic-tac-toe, Connect 4, Rock Paper Scissors and Memory with a global leaderboard.">
 <meta property="og:url" content="https://game.cronuschores.xyz/">
-<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --cream:#fdf6ec; --paper:#fffaf3; --ink:#3d3a35; --soft:#8a8278;
-    --x:#e8843f; --x-soft:#fbe5d4; --o:#4a9d8e; --o-soft:#d9efe9;
-    --line:#ece1d2; --shadow:rgba(120,90,50,0.12);
-  }
+  :root{--cream:#fdf6ec;--paper:#fffaf3;--ink:#3d3a35;--soft:#8a8278;--x:#e8843f;--x-soft:#fbe5d4;--o:#4a9d8e;--o-soft:#d9efe9;--yellow:#f0c042;--line:#ece1d2;--shadow:rgba(120,90,50,0.12);}
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'Nunito',sans-serif;background:var(--cream);background-image:radial-gradient(var(--line) 1.2px, transparent 1.2px);background-size:26px 26px;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 3rem;}
-  header{text-align:center;margin-bottom:1.5rem;animation:drop .7s ease both;}
-  h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.4rem,7vw,3.6rem);line-height:1;letter-spacing:-0.02em;}
+  body{font-family:'Nunito',sans-serif;background:var(--cream);background-image:radial-gradient(var(--line) 1.2px,transparent 1.2px);background-size:26px 26px;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 3rem;}
+  header{text-align:center;margin-bottom:1.25rem;animation:drop .7s ease both;}
+  h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,3rem);line-height:1;letter-spacing:-0.02em;}
   h1 .amp{color:var(--x);font-style:italic;}
-  .tagline{color:var(--soft);font-weight:600;margin-top:.6rem;font-size:1.05rem;}
-  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--o-soft);color:var(--o);font-weight:700;font-size:.8rem;padding:5px 13px;border-radius:999px;margin-top:1rem;letter-spacing:.02em;}
-  .card{background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:1.75rem;box-shadow:0 18px 40px -20px var(--shadow);width:100%;max-width:440px;animation:drop .7s .1s ease both;}
-  .whoami{text-align:center;font-weight:700;font-size:.85rem;color:var(--soft);margin-bottom:.75rem;}
-  .whoami b{color:var(--ink);}
-  .whoami a{color:var(--x);cursor:pointer;text-decoration:underline;}
+  .tagline{color:var(--soft);font-weight:600;margin-top:.5rem;font-size:1rem;}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--o-soft);color:var(--o);font-weight:700;font-size:.8rem;padding:5px 13px;border-radius:999px;margin-top:.75rem;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:1.5rem;box-shadow:0 18px 40px -20px var(--shadow);width:100%;max-width:460px;animation:drop .7s .1s ease both;}
+  .whoami{text-align:center;font-weight:700;font-size:.82rem;color:var(--soft);margin-bottom:.75rem;}
+  .whoami b{color:var(--ink);}.whoami a{color:var(--x);cursor:pointer;text-decoration:underline;}
+  .gamepick{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem;}
+  .gp{border:1px solid var(--line);background:var(--cream);cursor:pointer;font-family:inherit;font-weight:800;font-size:.9rem;color:var(--soft);padding:13px 6px;border-radius:14px;transition:.2s;}
+  .gp.active{background:var(--x-soft);color:var(--x);border-color:var(--x);}
   .modes{display:flex;gap:6px;background:var(--cream);padding:6px;border-radius:16px;margin-bottom:1rem;}
-  .mode{flex:1;border:none;background:transparent;cursor:pointer;font-family:inherit;font-weight:800;font-size:.82rem;color:var(--soft);padding:11px 3px;border-radius:11px;transition:.25s;}
+  .mode{flex:1;border:none;background:transparent;cursor:pointer;font-family:inherit;font-weight:800;font-size:.8rem;color:var(--soft);padding:11px 3px;border-radius:11px;transition:.25s;}
   .mode.active{background:var(--paper);color:var(--ink);box-shadow:0 4px 12px -6px var(--shadow);}
-  .diff{display:flex;gap:8px;margin-bottom:1.25rem;}
-  .diff.hidden{display:none;}
+  .diff{display:flex;gap:8px;margin-bottom:1.25rem;}.diff.hidden{display:none;}
   .dbtn{flex:1;border:1px solid var(--line);background:var(--cream);cursor:pointer;font-family:inherit;font-weight:700;font-size:.85rem;color:var(--soft);padding:9px;border-radius:12px;transition:.2s;}
   .dbtn.active{background:var(--x-soft);color:var(--x);border-color:var(--x);}
-  .online-panel{display:none;flex-direction:column;gap:10px;margin-bottom:1.25rem;}
-  .online-panel.show{display:flex;}
-  .online-panel input,.name-input{font-family:inherit;font-size:1rem;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.15em;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream);color:var(--ink);}
+  .online-panel{display:none;flex-direction:column;gap:10px;margin-bottom:1.25rem;}.online-panel.show{display:flex;}
+  .online-panel input{font-family:inherit;font-size:1rem;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.15em;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream);color:var(--ink);}
   .online-panel input:focus{outline:none;border-color:var(--x);}
   .obtn{border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:.95rem;padding:12px;border-radius:12px;transition:.2s;}
-  .obtn.primary{background:var(--x);color:#fff;}
-  .obtn.secondary{background:var(--cream);color:var(--ink);border:1px solid var(--line);}
-  .obtn:active{transform:scale(.98);}
-  .room-tag{text-align:center;font-weight:800;color:var(--o);background:var(--o-soft);padding:8px;border-radius:10px;font-size:.9rem;letter-spacing:.1em;}
+  .obtn.primary{background:var(--x);color:#fff;}.obtn.secondary{background:var(--cream);color:var(--ink);border:1px solid var(--line);}
+  .room-tag{text-align:center;font-weight:800;color:var(--o);background:var(--o-soft);padding:8px;border-radius:10px;font-size:.9rem;letter-spacing:.08em;margin-bottom:1rem;}
   .or{text-align:center;color:var(--soft);font-weight:700;font-size:.8rem;}
-  .status{text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:1.4rem;min-height:2rem;margin-bottom:1.25rem;transition:.2s;}
-  .board{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem;}
-  .board.locked{opacity:.55;pointer-events:none;}
-  .cell{aspect-ratio:1;border:none;cursor:pointer;background:var(--cream);border-radius:20px;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.5rem,12vw,3.4rem);display:flex;align-items:center;justify-content:center;transition:transform .12s,background .2s;color:var(--ink);}
-  .cell:hover:not(.taken){background:#fbf1e2;transform:translateY(-2px);}
-  .cell:active{transform:scale(.95);}
-  .cell.x{color:var(--x);}
-  .cell.o{color:var(--o);}
-  .cell.win{background:var(--x-soft);animation:pop .4s ease;}
-  .cell.win.o{background:var(--o-soft);}
-  .mark{display:inline-block;animation:pop .3s ease;}
+  .status{text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:1.35rem;min-height:2rem;margin-bottom:1.1rem;}
+  .ttt-board{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.25rem;}
+  .ttt-board.locked{opacity:.55;pointer-events:none;}
+  .ttt-cell{aspect-ratio:1;border:none;cursor:pointer;background:var(--cream);border-radius:20px;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.2rem,11vw,3.2rem);display:flex;align-items:center;justify-content:center;transition:transform .12s,background .2s;}
+  .ttt-cell:hover:not(.taken){background:#fbf1e2;transform:translateY(-2px);}
+  .ttt-cell.x{color:var(--x);}.ttt-cell.o{color:var(--o);}
+  .ttt-cell.win{background:var(--x-soft);}.ttt-cell.win.o{background:var(--o-soft);}
+  .c4-board{background:#3a6ea5;border-radius:18px;padding:10px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:1.25rem;}
+  .c4-cell{aspect-ratio:1;background:var(--paper);border-radius:50%;cursor:pointer;transition:.15s;border:none;}
+  .c4-cell.r{background:var(--x);}.c4-cell.y{background:var(--yellow);}
+  .c4-cell.win{box-shadow:0 0 0 3px var(--ink);}
+  .rps-choices{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem;}
+  .rps{border:1px solid var(--line);background:var(--cream);cursor:pointer;font-size:2.6rem;padding:18px 0;border-radius:18px;transition:.2s;}
+  .rps:hover{background:#fbf1e2;transform:translateY(-2px);}
+  .rps-result{text-align:center;font-size:3rem;margin-bottom:.5rem;min-height:3.4rem;}
+  .rps-vs{display:flex;justify-content:space-around;align-items:center;margin-bottom:1rem;font-size:2.4rem;}
+  .rps-vs .lbl{font-size:.8rem;font-weight:700;color:var(--soft);display:block;text-align:center;}
+  .mem-board{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem;}
+  .mem-card{aspect-ratio:1;border:none;cursor:pointer;background:var(--x);border-radius:14px;font-size:1.8rem;display:flex;align-items:center;justify-content:center;transition:.2s;color:transparent;}
+  .mem-card.flip{background:var(--cream);color:var(--ink);}
+  .mem-card.matched{background:var(--o-soft);color:var(--ink);cursor:default;}
   .scores{display:flex;gap:10px;margin-bottom:1.25rem;}
-  .score{flex:1;text-align:center;background:var(--cream);border-radius:16px;padding:.9rem;}
-  .score .lbl{font-size:.8rem;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;}
-  .score .val{font-family:'Fraunces',serif;font-weight:900;font-size:1.9rem;margin-top:2px;}
-  .score.x .val{color:var(--x);}
-  .score.o .val{color:var(--o);}
+  .score{flex:1;text-align:center;background:var(--cream);border-radius:16px;padding:.85rem;}
+  .score .lbl{font-size:.76rem;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.04em;}
+  .score .val{font-family:'Fraunces',serif;font-weight:900;font-size:1.7rem;margin-top:2px;}
   .reset{width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:1rem;background:var(--ink);color:var(--paper);padding:14px;border-radius:16px;transition:.2s;}
-  .reset:hover{transform:translateY(-2px);box-shadow:0 12px 24px -12px var(--shadow);}
   .reset:active{transform:scale(.98);}
   .lb-toggle{width:100%;margin-top:10px;border:1px solid var(--line);cursor:pointer;font-family:inherit;font-weight:800;font-size:.95rem;background:var(--cream);color:var(--ink);padding:12px;border-radius:16px;}
-  .leaderboard{margin-top:14px;display:none;}
-  .leaderboard.show{display:block;animation:drop .4s ease both;}
-  .lb-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.2rem;margin-bottom:10px;text-align:center;}
+  .leaderboard{margin-top:14px;display:none;}.leaderboard.show{display:block;}
+  .lb-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.15rem;margin-bottom:10px;text-align:center;}
   .lb-row{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;font-weight:700;font-size:.9rem;}
   .lb-row:nth-child(even){background:var(--cream);}
   .lb-rank{color:var(--soft);font-family:'Fraunces',serif;font-weight:900;}
   .lb-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .lb-wins{color:var(--x);font-weight:800;}
-  .lb-sub{font-size:.72rem;color:var(--soft);font-weight:700;grid-column:2/4;}
   .lb-empty,.lb-loading{text-align:center;color:var(--soft);font-weight:700;padding:14px;font-size:.9rem;}
+  .hidden{display:none !important;}
   footer{margin-top:2rem;color:var(--soft);font-weight:600;font-size:.85rem;text-align:center;}
   .modal{position:fixed;inset:0;background:rgba(61,58,53,.35);display:none;align-items:center;justify-content:center;padding:1rem;z-index:50;}
   .modal.show{display:flex;}
   .modal-card{background:var(--paper);border-radius:24px;padding:1.75rem;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px -20px var(--shadow);}
   .modal-card h3{font-family:'Fraunces',serif;font-weight:900;font-size:1.3rem;margin-bottom:.5rem;}
   .modal-card p{color:var(--soft);font-weight:600;font-size:.9rem;margin-bottom:1rem;}
-  .modal-card input{width:100%;margin-bottom:1rem;text-transform:none;letter-spacing:normal;text-align:center;}
+  .modal-card input{width:100%;margin-bottom:1rem;text-align:center;font-family:inherit;font-size:1rem;font-weight:700;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream);}
   @keyframes drop{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
-  @keyframes pop{0%{transform:scale(.3);opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
 </style>
 </head>
 <body>
   <header>
-    <h1>Noughts <span class="amp">&amp;</span> Crosses</h1>
-    <p class="tagline">A warm little game for two. No ads, ever.</p>
+    <h1>Cronus <span class="amp">Games</span></h1>
+    <p class="tagline">A little collection. No ads, ever.</p>
     <span class="badge">&#9829; 100% free &amp; ad-free</span>
   </header>
 
   <main class="card">
     <div class="whoami" id="whoami"></div>
 
-    <div class="modes">
-      <button class="mode active" id="mode-2p">Two players</button>
-      <button class="mode" id="mode-cpu">vs Computer</button>
-      <button class="mode" id="mode-online">Play online</button>
+    <div class="gamepick">
+      <button class="gp active" data-g="ttt">&#11093;&#10060; Tic-Tac-Toe</button>
+      <button class="gp" data-g="c4">&#128313; Connect 4</button>
+      <button class="gp" data-g="rps">&#9994; Rock Paper Scissors</button>
+      <button class="gp" data-g="mem">&#127183; Memory</button>
+    </div>
+
+    <div class="modes" id="modes">
+      <button class="mode active" data-m="2p">Two players</button>
+      <button class="mode" data-m="cpu">vs Computer</button>
+      <button class="mode" data-m="online" id="onlineModeBtn">Play online</button>
     </div>
 
     <div class="diff hidden" id="diff">
@@ -120,18 +123,21 @@
       <button class="obtn secondary" id="joinBtn">Join room</button>
     </div>
 
-    <div class="status" id="status">Player X's turn</div>
-    <div class="board" id="board"></div>
+    <div class="status" id="status"></div>
 
-    <div class="scores">
-      <div class="score x"><div class="lbl">X wins</div><div class="val" id="sx">0</div></div>
-      <div class="score"><div class="lbl">Draws</div><div class="val" id="sd">0</div></div>
-      <div class="score o"><div class="lbl">O wins</div><div class="val" id="so">0</div></div>
+    <div id="area-ttt"></div>
+    <div id="area-c4" class="hidden"></div>
+    <div id="area-rps" class="hidden"></div>
+    <div id="area-mem" class="hidden"></div>
+
+    <div class="scores" id="scores">
+      <div class="score"><div class="lbl" id="lblA">P1</div><div class="val" id="scA">0</div></div>
+      <div class="score"><div class="lbl">Draws</div><div class="val" id="scD">0</div></div>
+      <div class="score"><div class="lbl" id="lblB">P2</div><div class="val" id="scB">0</div></div>
     </div>
 
     <button class="reset" id="reset">New round</button>
     <button class="lb-toggle" id="lbToggle">&#127942; Show leaderboard</button>
-
     <div class="leaderboard" id="leaderboard">
       <div class="lb-title">&#127942; Global Leaderboard</div>
       <div id="lbList"><div class="lb-loading">Loading…</div></div>
@@ -144,165 +150,42 @@
     <div class="modal-card">
       <h3>What's your name?</h3>
       <p>Used for the global leaderboard. Saved on this device.</p>
-      <input class="name-input" id="nameInput" maxlength="20" placeholder="Your name" autocomplete="off">
+      <input id="nameInput" maxlength="20" placeholder="Your name" autocomplete="off">
       <button class="obtn primary" id="nameSave" style="width:100%;">Save</button>
     </div>
   </div>
 
 <script>
 (function(){
-  var PIESOCKET_API_KEY = "OsYl4zuI9ZrFa1i71JGUgXfIr0gyo4YtB1JXf5lr";
-  var PIESOCKET_CLUSTER = "free.blr2";
-  var LEADERBOARD_URL = "https://tictactoe-leaderboard.cronustjy.workers.dev";
+  var PIESOCKET_API_KEY="OsYl4zuI9ZrFa1i71JGUgXfIr0gyo4YtB1JXf5lr";
+  var PIESOCKET_CLUSTER="free.blr2";
+  var LEADERBOARD_URL="https://tictactoe-leaderboard.cronustjy.workers.dev";
 
-  var boardEl=document.getElementById('board');
-  var statusEl=document.getElementById('status');
-  var resetBtn=document.getElementById('reset');
-  var m2p=document.getElementById('mode-2p');
-  var mcpu=document.getElementById('mode-cpu');
-  var mon=document.getElementById('mode-online');
-  var diffEl=document.getElementById('diff');
-  var dbtns=diffEl.querySelectorAll('.dbtn');
-  var panel=document.getElementById('onlinePanel');
-  var createBtn=document.getElementById('createBtn');
-  var joinBtn=document.getElementById('joinBtn');
-  var joinCode=document.getElementById('joinCode');
-  var sx=document.getElementById('sx'),so=document.getElementById('so'),sd=document.getElementById('sd');
-  var whoami=document.getElementById('whoami');
-  var lbToggle=document.getElementById('lbToggle');
-  var leaderboard=document.getElementById('leaderboard');
-  var lbList=document.getElementById('lbList');
-  var nameModal=document.getElementById('nameModal');
-  var nameInput=document.getElementById('nameInput');
-  var nameSave=document.getElementById('nameSave');
+  var game='ttt',mode='2p',difficulty='easy';
+  var statusEl=document.getElementById('status'),modesEl=document.getElementById('modes'),diffEl=document.getElementById('diff');
+  var resetBtn=document.getElementById('reset'),onlineBtn=document.getElementById('onlineModeBtn');
+  var panel=document.getElementById('onlinePanel'),createBtn=document.getElementById('createBtn'),joinBtn=document.getElementById('joinBtn'),joinCode=document.getElementById('joinCode');
+  var scA=document.getElementById('scA'),scB=document.getElementById('scB'),scD=document.getElementById('scD'),lblA=document.getElementById('lblA'),lblB=document.getElementById('lblB');
+  var whoami=document.getElementById('whoami'),lbToggle=document.getElementById('lbToggle'),leaderboard=document.getElementById('leaderboard'),lbList=document.getElementById('lbList');
+  var nameModal=document.getElementById('nameModal'),nameInput=document.getElementById('nameInput'),nameSave=document.getElementById('nameSave');
+  var scores={a:0,b:0,d:0};
+  var areas={ttt:document.getElementById('area-ttt'),c4:document.getElementById('area-c4'),rps:document.getElementById('area-rps'),mem:document.getElementById('area-mem')};
+  var ws=null,room=null,myMark=null,onlineConnected=false;
 
-  var board=Array(9).fill('');
-  var current='X', over=false, scores={X:0,O:0,D:0};
-  var mode='2p', difficulty='easy';
-  var streak=0;
-  var wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  var ws=null, room=null, myMark=null, onlineConnected=false;
-
-  var playerName = getName();
-  function getName(){ try{ return localStorage.getItem('ttt_name') || ''; }catch(e){ return ''; } }
-  function saveName(n){ try{ localStorage.setItem('ttt_name', n); }catch(e){} playerName=n; renderWhoami(); }
+  var playerName=getName();
+  function getName(){ try{return localStorage.getItem('cg_name')||'';}catch(e){return '';} }
+  function saveName(n){ try{localStorage.setItem('cg_name',n);}catch(e){} playerName=n; renderWhoami(); }
+  function escapeHtml(s){ return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function renderWhoami(){
-    if(playerName){ whoami.innerHTML='Playing as <b>'+escapeHtml(playerName)+'</b> · <a id="changeName">change</a>'; var cn=document.getElementById('changeName'); if(cn) cn.addEventListener('click',promptName); }
-    else { whoami.innerHTML='<a id="setName">Set your name for the leaderboard</a>'; var sn=document.getElementById('setName'); if(sn) sn.addEventListener('click',promptName); }
+    if(playerName){ whoami.innerHTML='Playing as <b>'+escapeHtml(playerName)+'</b> · <a id="cn">change</a>'; }
+    else { whoami.innerHTML='<a id="cn">Set your name for the leaderboard</a>'; }
+    var cn=document.getElementById('cn'); if(cn) cn.addEventListener('click',promptName);
   }
   function promptName(){ nameInput.value=playerName||''; nameModal.classList.add('show'); nameInput.focus(); }
   nameSave.addEventListener('click',function(){ var v=(nameInput.value||'').trim().slice(0,20); if(v){ saveName(v); nameModal.classList.remove('show'); } });
-  function escapeHtml(s){ return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 
-  function setMode(m){
-    mode=m;
-    m2p.classList.toggle('active',m==='2p');
-    mcpu.classList.toggle('active',m==='cpu');
-    mon.classList.toggle('active',m==='online');
-    diffEl.classList.toggle('hidden',m!=='cpu');
-    panel.classList.toggle('show',m==='online');
-    if(ws){ try{ws.close();}catch(e){} ws=null; onlineConnected=false; }
-    newRound();
-  }
-  function setDiff(d){ difficulty=d; dbtns.forEach(function(b){b.classList.toggle('active',b.getAttribute('data-d')===d);}); newRound(); }
-  function newRound(sendSync){ board=Array(9).fill(''); current='X'; over=false; render(); updateStatus(); if(mode==='online'&&onlineConnected&&sendSync){ sendMsg({t:'reset'}); } }
-  function render(winLine){
-    boardEl.innerHTML='';
-    var lock=(mode==='online')&&(!onlineConnected||current!==myMark||over);
-    boardEl.classList.toggle('locked', lock&&!over);
-    board.forEach(function(v,i){
-      var c=document.createElement('button');
-      c.className='cell'+(v?' taken '+v.toLowerCase():'');
-      if(winLine&&winLine.indexOf(i)!==-1) c.className+=' win '+v.toLowerCase();
-      if(v) c.innerHTML='<span class="mark">'+v+'</span>';
-      c.addEventListener('click',function(){play(i);});
-      boardEl.appendChild(c);
-    });
-  }
-  function updateStatus(){
-    if(mode==='online'){
-      if(!onlineConnected){ statusEl.textContent='Create or join a room to start'; return; }
-      if(over) return;
-      statusEl.textContent=(current===myMark)?"Your turn ("+myMark+")":"Friend's turn ("+current+")";
-      return;
-    }
-    if(mode==='cpu'&&current==='O'){ statusEl.textContent="Computer's turn"; return; }
-    statusEl.textContent="Player "+current+"'s turn";
-  }
-  function winningLine(b,p){ for(var k=0;k<wins.length;k++){ if(wins[k].every(function(i){return b[i]===p;})) return wins[k]; } return null; }
-  function emptyCells(b){ var e=[]; for(var i=0;i<9;i++) if(b[i]==='') e.push(i); return e; }
-
-  function play(i){
-    if(over||board[i]!=='') return;
-    if(mode==='cpu'&&current==='O') return;
-    if(mode==='online'){
-      if(!onlineConnected||current!==myMark) return;
-      board[i]=current; sendMsg({t:'move',i:i,mark:current});
-      if(finish()) return;
-      current=current==='X'?'O':'X'; render(); updateStatus(); return;
-    }
-    board[i]=current;
-    if(finish()) return;
-    current=current==='X'?'O':'X'; render(); updateStatus();
-    if(mode==='cpu'&&current==='O'&&!over){ statusEl.textContent='Computer thinking…'; setTimeout(cpuMove,450); }
-  }
-  function finish(){
-    var line=winningLine(board,current);
-    if(line){
-      over=true; scores[current]++;
-      sx.textContent=scores.X; so.textContent=scores.O; sd.textContent=scores.D;
-      render(line);
-      var who;
-      if(mode==='online'){ who=(current===myMark?'You win!':'Friend wins!'); reportOnline(current===myMark?'win':'loss'); }
-      else if(mode==='cpu'){
-        if(current==='X'){ who='You win!'; streak++; report('win'); }
-        else { who='Computer wins!'; streak=0; report('loss'); }
-      }
-      else who='Player '+current+' wins!';
-      statusEl.textContent=who+' \uD83C\uDF89';
-      return true;
-    }
-    if(board.every(function(c){return c!=='';})){
-      over=true; scores.D++; sd.textContent=scores.D; render();
-      statusEl.textContent="It's a draw! \uD83E\uDD1D";
-      if(mode==='cpu'){ streak=0; report('draw'); }
-      else if(mode==='online') reportOnline('draw');
-      return true;
-    }
-    return false;
-  }
-
-  function findTwo(p){ for(var k=0;k<wins.length;k++){ var ln=wins[k],vv=ln.map(function(i){return board[i];}); if(vv.filter(function(x){return x===p;}).length===2&&vv.indexOf('')!==-1) return ln[vv.indexOf('')]; } return null; }
-  function tacticalMove(){ var w=findTwo('O'); if(w!==null) return w; var b=findTwo('X'); if(b!==null) return b; if(board[4]==='') return 4; return null; }
-  function minimax(b,player){
-    if(winningLine(b,'O')) return {score:10};
-    if(winningLine(b,'X')) return {score:-10};
-    var avail=emptyCells(b); if(avail.length===0) return {score:0};
-    var best=(player==='O')?{score:-999}:{score:999};
-    for(var n=0;n<avail.length;n++){ var idx=avail[n]; b[idx]=player; var r=minimax(b,player==='O'?'X':'O'); b[idx]='';
-      if(player==='O'){ if(r.score>best.score) best={score:r.score,move:idx}; } else { if(r.score<best.score) best={score:r.score,move:idx}; } }
-    return best;
-  }
-  function cpuMove(){
-    var empty=emptyCells(board), move;
-    if(difficulty==='easy'){ if(Math.random()<0.7) move=empty[Math.floor(Math.random()*empty.length)]; else { move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; } }
-    else if(difficulty==='medium'){ if(Math.random()<0.8){ move=tacticalMove(); if(move===null) move=empty[Math.floor(Math.random()*empty.length)]; } else move=empty[Math.floor(Math.random()*empty.length)]; }
-    else { move=minimax(board.slice(),'O').move; if(move===undefined||move===null) move=empty[Math.floor(Math.random()*empty.length)]; }
-    board[move]='O'; if(finish()) return; current='X'; render(); updateStatus();
-  }
-
-  function report(result){
-    if(!playerName) return;
-    fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:playerName,result:result,difficulty:difficulty,streak:streak})
-    }).then(function(){ if(leaderboard.classList.contains('show')) loadLeaderboard(); }).catch(function(){});
-  }
-  function reportOnline(result){
-    if(!playerName) return;
-    fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:playerName,result:result})
-    }).then(function(){ if(leaderboard.classList.contains('show')) loadLeaderboard(); }).catch(function(){});
-  }
+  function reportWin(){ if(!playerName) return; fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:playerName,result:'win'})}).then(function(){ if(leaderboard.classList.contains('show')) loadLeaderboard(); }).catch(function(){}); }
+  function reportResult(r){ if(!playerName) return; fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:playerName,result:r})}).then(function(){ if(leaderboard.classList.contains('show')) loadLeaderboard(); }).catch(function(){}); }
   function loadLeaderboard(){
     lbList.innerHTML='<div class="lb-loading">Loading…</div>';
     fetch(LEADERBOARD_URL+'/scores').then(function(r){return r.json();}).then(function(data){
@@ -311,61 +194,121 @@
       var html='';
       players.slice(0,10).forEach(function(p,idx){
         var medal=idx===0?'\uD83E\uDD47':idx===1?'\uD83E\uDD48':idx===2?'\uD83E\uDD49':(idx+1);
-        var sub='best streak '+(p.bestStreak||0)+' · E'+(p.easy||0)+' M'+(p.medium||0)+' H'+(p.hard||0);
-        html+='<div class="lb-row"><div class="lb-rank">'+medal+'</div>'+
-              '<div class="lb-name">'+escapeHtml(p.name||'?')+'</div>'+
-              '<div class="lb-wins">'+(p.wins||0)+' wins</div>'+
-              '<div class="lb-sub">'+sub+'</div></div>';
+        html+='<div class="lb-row"><div class="lb-rank">'+medal+'</div><div class="lb-name">'+escapeHtml(p.name||'?')+'</div><div class="lb-wins">'+(p.wins||0)+' wins</div></div>';
       });
       lbList.innerHTML=html;
     }).catch(function(){ lbList.innerHTML='<div class="lb-empty">Could not load leaderboard.</div>'; });
   }
-  lbToggle.addEventListener('click',function(){
-    var show=!leaderboard.classList.contains('show');
-    leaderboard.classList.toggle('show',show);
-    lbToggle.innerHTML=show?'&#127942; Hide leaderboard':'&#127942; Show leaderboard';
-    if(show) loadLeaderboard();
-  });
+  lbToggle.addEventListener('click',function(){ var show=!leaderboard.classList.contains('show'); leaderboard.classList.toggle('show',show); lbToggle.innerHTML=show?'&#127942; Hide leaderboard':'&#127942; Show leaderboard'; if(show) loadLeaderboard(); });
+
+  function resetScores(){ scores={a:0,b:0,d:0}; scA.textContent=0;scB.textContent=0;scD.textContent=0; }
+  function setLabels(a,b){ lblA.textContent=a; lblB.textContent=b; }
+
+  var T={board:[],current:'X',over:false};
+  var twins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  function tttNew(sendSync){ T.board=Array(9).fill('');T.current='X';T.over=false; tttRender();
+    if(mode==='online'){ if(onlineConnected&&sendSync) sendMsg({t:'reset'}); }
+    tttStatus(); }
+  function tttStatus(){ if(mode==='online'){ if(!onlineConnected){statusEl.textContent='Create or join a room to start';return;} statusEl.textContent=(T.current===myMark)?"Your turn ("+myMark+")":"Friend's turn"; return; } statusEl.textContent=(mode==='cpu')?(T.current==='X'?"Your turn (X)":"Computer's turn"):"Player "+T.current+"'s turn"; }
+  function tttRender(winLine){
+    var lock=(mode==='online')&&(!onlineConnected||T.current!==myMark||T.over);
+    var html='<div class="ttt-board'+(lock&&!T.over?' locked':'')+'">';
+    for(var i=0;i<9;i++){ var v=T.board[i]; html+='<button class="ttt-cell'+(v?' taken '+v.toLowerCase():'')+(winLine&&winLine.indexOf(i)!==-1?' win '+(v?v.toLowerCase():''):'')+'" data-i="'+i+'">'+(v||'')+'</button>'; }
+    html+='</div>'; areas.ttt.innerHTML=html;
+    areas.ttt.querySelectorAll('.ttt-cell').forEach(function(c){ c.addEventListener('click',function(){ tttPlay(parseInt(c.getAttribute('data-i'),10)); }); });
+  }
+  function tttWinLine(b,p){ for(var k=0;k<twins.length;k++){ if(twins[k].every(function(i){return b[i]===p;})) return twins[k]; } return null; }
+  function tttEmpty(b){ var e=[]; for(var i=0;i<9;i++) if(b[i]==='') e.push(i); return e; }
+  function tttPlay(i){
+    if(T.over||T.board[i]!=='') return;
+    if(mode==='cpu'&&T.current==='O') return;
+    if(mode==='online'){ if(!onlineConnected||T.current!==myMark) return; T.board[i]=T.current; sendMsg({t:'move',i:i,mark:T.current}); if(tttFinish()) return; T.current=T.current==='X'?'O':'X'; tttRender(); tttStatus(); return; }
+    T.board[i]=T.current; if(tttFinish()) return; T.current=T.current==='X'?'O':'X'; tttRender(); tttStatus();
+    if(mode==='cpu'&&T.current==='O'){ statusEl.textContent='Computer thinking…'; setTimeout(tttCpu,420); }
+  }
+  function tttFinish(){
+    var line=tttWinLine(T.board,T.current);
+    if(line){ T.over=true; tttRender(line);
+      if(mode==='online'){ if(T.current===myMark){ scores.a++; scA.textContent=scores.a; statusEl.textContent='You win! \uD83C\uDF89'; reportWin(); } else { scores.b++; scB.textContent=scores.b; statusEl.textContent='Friend wins! \uD83C\uDF89'; reportResult('loss'); } return true; }
+      if(T.current==='X'){ scores.a++; scA.textContent=scores.a; statusEl.textContent=(mode==='cpu'?'You win!':'Player X wins!')+' \uD83C\uDF89'; if(mode==='cpu') reportWin(); }
+      else { scores.b++; scB.textContent=scores.b; statusEl.textContent=(mode==='cpu'?'Computer wins!':'Player O wins!')+' \uD83C\uDF89'; if(mode==='cpu') reportResult('loss'); }
+      return true; }
+    if(T.board.every(function(c){return c!=='';})){ T.over=true; scores.d++; scD.textContent=scores.d; statusEl.textContent="It's a draw! \uD83E\uDD1D"; if(mode==='cpu'||mode==='online') reportResult('draw'); return true; }
+    return false;
+  }
+  function tttFindTwo(p){ for(var k=0;k<twins.length;k++){ var ln=twins[k],vv=ln.map(function(i){return T.board[i];}); if(vv.filter(function(x){return x===p;}).length===2&&vv.indexOf('')!==-1) return ln[vv.indexOf('')]; } return null; }
+  function tttTactical(){ var w=tttFindTwo('O'); if(w!==null) return w; var b=tttFindTwo('X'); if(b!==null) return b; if(T.board[4]==='') return 4; return null; }
+  function tttMinimax(b,player){ if(tttWinLine(b,'O')) return {s:10}; if(tttWinLine(b,'X')) return {s:-10}; var av=tttEmpty(b); if(!av.length) return {s:0}; var best=player==='O'?{s:-999}:{s:999}; for(var n=0;n<av.length;n++){ var idx=av[n]; b[idx]=player; var r=tttMinimax(b,player==='O'?'X':'O'); b[idx]=''; if(player==='O'){ if(r.s>best.s) best={s:r.s,m:idx}; } else { if(r.s<best.s) best={s:r.s,m:idx}; } } return best; }
+  function tttCpu(){ var e=tttEmpty(T.board),m;
+    if(difficulty==='easy'){ if(Math.random()<0.7) m=e[Math.floor(Math.random()*e.length)]; else { m=tttTactical(); if(m===null) m=e[Math.floor(Math.random()*e.length)]; } }
+    else if(difficulty==='medium'){ if(Math.random()<0.8){ m=tttTactical(); if(m===null) m=e[Math.floor(Math.random()*e.length)]; } else m=e[Math.floor(Math.random()*e.length)]; }
+    else { m=tttMinimax(T.board.slice(),'O').m; if(m===undefined||m===null) m=e[Math.floor(Math.random()*e.length)]; }
+    T.board[m]='O'; if(tttFinish()) return; T.current='X'; tttRender(); tttStatus();
+  }
+
+  var COLS=7,ROWS=6,C={board:[],current:'R',over:false};
+  function c4idx(r,c){return r*COLS+c;}
+  function c4New(){ C.board=Array(ROWS*COLS).fill('');C.current='R';C.over=false; c4Render(); statusEl.textContent=(mode==='cpu')?"Your turn (Red)":"Red's turn"; }
+  function c4Render(winCells){ var html='<div class="c4-board">';
+    for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++){ var v=C.board[c4idx(r,c)]; html+='<button class="c4-cell'+(v==='R'?' r':v==='Y'?' y':'')+(winCells&&winCells.indexOf(c4idx(r,c))!==-1?' win':'')+'" data-c="'+c+'"></button>'; }
+    html+='</div>'; areas.c4.innerHTML=html;
+    areas.c4.querySelectorAll('.c4-cell').forEach(function(b){ b.addEventListener('click',function(){ c4Drop(parseInt(b.getAttribute('data-c'),10)); }); });
+  }
+  function c4ColOpen(b,c){ for(var r=ROWS-1;r>=0;r--){ if(b[c4idx(r,c)]==='') return r; } return -1; }
+  function c4Cells(b,p){ for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++){ if(b[c4idx(r,c)]!==p) continue; var dirs=[[0,1],[1,0],[1,1],[1,-1]]; for(var d=0;d<dirs.length;d++){ var dr=dirs[d][0],dc=dirs[d][1],cells=[c4idx(r,c)],ok=true; for(var s=1;s<4;s++){ var nr=r+dr*s,nc=c+dc*s; if(nr<0||nr>=ROWS||nc<0||nc>=COLS||b[c4idx(nr,nc)]!==p){ok=false;break;} cells.push(c4idx(nr,nc)); } if(ok) return cells; } } return null; }
+  function c4Drop(col){ if(C.over) return; if(mode==='cpu'&&C.current==='Y') return; var r=c4ColOpen(C.board,col); if(r<0) return; C.board[c4idx(r,col)]=C.current; if(c4Finish()) return; C.current=C.current==='R'?'Y':'R'; c4Render(); statusEl.textContent=(mode==='cpu'&&C.current==='Y')?"Computer's turn":(mode==='cpu'?"Your turn (Red)":(C.current==='R'?"Red's turn":"Yellow's turn")); if(mode==='cpu'&&C.current==='Y'){ statusEl.textContent='Computer thinking…'; setTimeout(c4Cpu,450); } }
+  function c4Finish(){ var win=c4Cells(C.board,C.current); if(win){ C.over=true; c4Render(win); if(C.current==='R'){ scores.a++; scA.textContent=scores.a; statusEl.textContent=(mode==='cpu'?'You win!':'Red wins!')+' \uD83C\uDF89'; if(mode==='cpu') reportWin(); } else { scores.b++; scB.textContent=scores.b; statusEl.textContent=(mode==='cpu'?'Computer wins!':'Yellow wins!')+' \uD83C\uDF89'; if(mode==='cpu') reportResult('loss'); } return true; } if(C.board.every(function(c){return c!=='';})){ C.over=true; scores.d++; scD.textContent=scores.d; statusEl.textContent="It's a draw! \uD83E\uDD1D"; if(mode==='cpu') reportResult('draw'); return true; } return false; }
+  function c4ValidCols(b){ var out=[]; for(var c=0;c<COLS;c++) if(c4ColOpen(b,c)>=0) out.push(c); return out; }
+  function c4TryWin(b,p){ var cols=c4ValidCols(b); for(var i=0;i<cols.length;i++){ var c=cols[i],r=c4ColOpen(b,c); b[c4idx(r,c)]=p; var w=c4Cells(b,p); b[c4idx(r,c)]=''; if(w) return c; } return null; }
+  function c4Cpu(){ var b=C.board,cols=c4ValidCols(b),col=null;
+    if(difficulty==='hard'){ col=c4TryWin(b,'Y'); if(col===null) col=c4TryWin(b,'R'); if(col===null&&cols.indexOf(3)!==-1) col=3; if(col===null) col=cols[Math.floor(Math.random()*cols.length)]; }
+    else if(difficulty==='medium'){ col=c4TryWin(b,'Y'); if(col===null) col=c4TryWin(b,'R'); if(col===null) col=cols[Math.floor(Math.random()*cols.length)]; }
+    else { if(Math.random()<0.5) col=c4TryWin(b,'Y'); if(col===null) col=cols[Math.floor(Math.random()*cols.length)]; }
+    var r=c4ColOpen(b,col); b[c4idx(r,col)]='Y'; if(c4Finish()) return; C.current='R'; c4Render(); statusEl.textContent="Your turn (Red)";
+  }
+
+  var RPS=['\u270A','\u270B','\u270C\uFE0F'],RPSN=['Rock','Paper','Scissors'];
+  function rpsNew(){ var html='<div class="rps-result" id="rpsResult"></div><div class="rps-vs" id="rpsVs"></div><div class="rps-choices">'; for(var i=0;i<3;i++) html+='<button class="rps" data-r="'+i+'">'+RPS[i]+'</button>'; html+='</div>'; areas.rps.innerHTML=html; areas.rps.querySelectorAll('.rps').forEach(function(b){ b.addEventListener('click',function(){ rpsPlay(parseInt(b.getAttribute('data-r'),10)); }); }); statusEl.textContent='Pick your move!'; }
+  function rpsPlay(me){ var cpu=Math.floor(Math.random()*3),res; if(me===cpu) res=0; else if((me===0&&cpu===2)||(me===1&&cpu===0)||(me===2&&cpu===1)) res=1; else res=2; document.getElementById('rpsVs').innerHTML='<div><span class="lbl">You</span>'+RPS[me]+'</div><div style="font-size:1rem;color:var(--soft);font-weight:700;">vs</div><div><span class="lbl">Computer</span>'+RPS[cpu]+'</div>'; var rEl=document.getElementById('rpsResult'); if(res===0){ scores.d++; scD.textContent=scores.d; rEl.textContent='\uD83E\uDD1D'; statusEl.textContent="Draw — both picked "+RPSN[me]; reportResult('draw'); } else if(res===1){ scores.a++; scA.textContent=scores.a; rEl.textContent='\uD83C\uDF89'; statusEl.textContent="You win! "+RPSN[me]+" beats "+RPSN[cpu]; reportWin(); } else { scores.b++; scB.textContent=scores.b; rEl.textContent='\uD83D\uDE05'; statusEl.textContent="Computer wins. "+RPSN[cpu]+" beats "+RPSN[me]; reportResult('loss'); } }
+
+  var MEMICONS=['\uD83C\uDF4E','\uD83C\uDF4C','\uD83C\uDF53','\uD83C\uDF47','\uD83C\uDF51','\uD83C\uDF4D','\uD83E\uDD5D','\uD83C\uDF45'];
+  var M={cards:[],flipped:[],matched:[],busy:false,moves:0};
+  function memNew(){ var deck=MEMICONS.concat(MEMICONS); for(var i=deck.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)),t=deck[i];deck[i]=deck[j];deck[j]=t; } M.cards=deck;M.flipped=[];M.matched=[];M.busy=false;M.moves=0; memRender(); statusEl.textContent='Find all the pairs!'; }
+  function memRender(){ var html='<div class="mem-board">'; for(var i=0;i<M.cards.length;i++){ var shown=M.flipped.indexOf(i)!==-1||M.matched.indexOf(i)!==-1; html+='<button class="mem-card'+(M.matched.indexOf(i)!==-1?' matched':shown?' flip':'')+'" data-i="'+i+'">'+(shown?M.cards[i]:'')+'</button>'; } html+='</div>'; areas.mem.innerHTML=html; areas.mem.querySelectorAll('.mem-card').forEach(function(b){ b.addEventListener('click',function(){ memFlip(parseInt(b.getAttribute('data-i'),10)); }); }); }
+  function memFlip(i){ if(M.busy||M.flipped.indexOf(i)!==-1||M.matched.indexOf(i)!==-1) return; M.flipped.push(i); memRender(); if(M.flipped.length===2){ M.moves++; M.busy=true; var a=M.flipped[0],b=M.flipped[1]; if(M.cards[a]===M.cards[b]){ M.matched.push(a,b); M.flipped=[]; M.busy=false; memRender(); if(M.matched.length===M.cards.length){ scores.a++; scA.textContent=scores.a; statusEl.textContent='You won in '+M.moves+' moves! \uD83C\uDF89'; } else statusEl.textContent='Match! Keep going.'; } else { statusEl.textContent='Nope — try again'; setTimeout(function(){ M.flipped=[]; M.busy=false; memRender(); },750); } } }
 
   function randCode(){ var c='',a='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; for(var i=0;i<4;i++) c+=a[Math.floor(Math.random()*a.length)]; return c; }
-  function connect(code,asHost){
-    room=code; myMark=asHost?'X':'O';
-    var url='wss://'+PIESOCKET_CLUSTER+'.piesocket.com/v3/'+code+'?api_key='+PIESOCKET_API_KEY+'&notify_self=0';
-    statusEl.textContent='Connecting…';
-    try{ ws=new WebSocket(url); }catch(e){ statusEl.textContent='Connection failed'; return; }
-    ws.onopen=function(){
-      onlineConnected=true; panel.classList.remove('show');
-      var tag=document.createElement('div'); tag.className='room-tag'; tag.id='roomTag';
-      tag.textContent='Room code: '+code+'   ·   you are '+myMark;
-      panel.parentNode.insertBefore(tag,statusEl);
-      newRound(false);
-      statusEl.textContent=asHost?'Share code '+code+' — waiting for friend…':'Joined! '+(current===myMark?'Your turn':"Friend's turn");
-      if(!asHost) sendMsg({t:'hello'});
-    };
-    ws.onmessage=function(ev){
-      var data; try{ data=JSON.parse(ev.data); }catch(e){ return; }
-      if(!data||!data.t) return;
-      if(data.t==='hello'){ if(myMark==='X'){ sendMsg({t:'welcome'}); statusEl.textContent='Friend joined! Your turn'; render(); } return; }
-      if(data.t==='welcome'){ statusEl.textContent="Friend's turn"; render(); return; }
-      if(data.t==='move'){ if(board[data.i]===''&&data.mark===current){ board[data.i]=data.mark; if(finish()) return; current=current==='X'?'O':'X'; render(); updateStatus(); } return; }
-      if(data.t==='reset'){ board=Array(9).fill(''); current='X'; over=false; render(); updateStatus(); return; }
-    };
+  function connect(code,asHost){ room=code; myMark=asHost?'X':'O'; var url='wss://'+PIESOCKET_CLUSTER+'.piesocket.com/v3/'+code+'?api_key='+PIESOCKET_API_KEY+'&notify_self=0'; statusEl.textContent='Connecting…'; try{ ws=new WebSocket(url); }catch(e){ statusEl.textContent='Connection failed'; return; }
+    ws.onopen=function(){ onlineConnected=true; panel.classList.remove('show'); var tag=document.createElement('div'); tag.className='room-tag'; tag.id='roomTag'; tag.textContent='Room '+code+' · you are '+myMark; panel.parentNode.insertBefore(tag,statusEl); tttNew(false); statusEl.textContent=asHost?'Share code '+code+' — waiting…':'Joined! '+(T.current===myMark?'Your turn':"Friend's turn"); if(!asHost) sendMsg({t:'hello'}); };
+    ws.onmessage=function(ev){ var d; try{ d=JSON.parse(ev.data); }catch(e){ return; } if(!d||!d.t) return; if(d.t==='hello'){ if(myMark==='X'){ sendMsg({t:'welcome'}); statusEl.textContent='Friend joined! Your turn'; tttRender(); } return; } if(d.t==='welcome'){ statusEl.textContent="Friend's turn"; tttRender(); return; } if(d.t==='move'){ if(T.board[d.i]===''&&d.mark===T.current){ T.board[d.i]=d.mark; if(tttFinish()) return; T.current=T.current==='X'?'O':'X'; tttRender(); tttStatus(); } return; } if(d.t==='reset'){ T.board=Array(9).fill(''); T.current='X'; T.over=false; tttRender(); tttStatus(); return; } };
     ws.onclose=function(){ onlineConnected=false; if(mode==='online'){ statusEl.textContent='Disconnected. Create or join again.'; var rt=document.getElementById('roomTag'); if(rt) rt.remove(); panel.classList.add('show'); } };
-    ws.onerror=function(){ statusEl.textContent='Connection error — check your key'; };
+    ws.onerror=function(){ statusEl.textContent='Connection error'; };
   }
-  function sendMsg(obj){ if(ws&&ws.readyState===1) ws.send(JSON.stringify(obj)); }
-
+  function sendMsg(o){ if(ws&&ws.readyState===1) ws.send(JSON.stringify(o)); }
   createBtn.addEventListener('click',function(){ connect(randCode(),true); });
   joinBtn.addEventListener('click',function(){ var c=(joinCode.value||'').toUpperCase().trim(); if(c.length<4){ statusEl.textContent='Enter the 4-letter code'; return; } connect(c,false); });
-  m2p.addEventListener('click',function(){setMode('2p');});
-  mcpu.addEventListener('click',function(){setMode('cpu');});
-  mon.addEventListener('click',function(){setMode('online');});
-  dbtns.forEach(function(b){ b.addEventListener('click',function(){ setDiff(b.getAttribute('data-d')); }); });
-  resetBtn.addEventListener('click',function(){ newRound(true); });
+
+  function showArea(){ for(var k in areas){ areas[k].classList.toggle('hidden',k!==game); } }
+  function closeWs(){ if(ws){ try{ws.close();}catch(e){} ws=null; onlineConnected=false; } var rt=document.getElementById('roomTag'); if(rt) rt.remove(); }
+  function configForGame(){
+    showArea(); closeWs(); panel.classList.remove('show');
+    onlineBtn.classList.toggle('hidden',game!=='ttt');
+    if(game==='ttt'){ modesEl.classList.remove('hidden'); diffEl.classList.toggle('hidden',mode!=='cpu'); panel.classList.toggle('show',mode==='online'); setLabels(mode==='cpu'?'You':(mode==='online'?'You':'X'),mode==='cpu'?'CPU':(mode==='online'?'Friend':'O')); }
+    else if(game==='c4'){ modesEl.classList.remove('hidden'); diffEl.classList.toggle('hidden',mode!=='cpu'); setLabels(mode==='cpu'?'You':'Red',mode==='cpu'?'CPU':'Yellow'); }
+    else if(game==='rps'){ modesEl.classList.add('hidden'); diffEl.classList.add('hidden'); setLabels('You','CPU'); }
+    else if(game==='mem'){ modesEl.classList.add('hidden'); diffEl.classList.add('hidden'); setLabels('Wins','—'); }
+    startGame();
+  }
+  function startGame(){ if(game==='ttt') tttNew(true); else if(game==='c4') c4New(); else if(game==='rps') rpsNew(); else if(game==='mem') memNew(); }
+
+  document.querySelectorAll('.gp').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('.gp').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); game=b.getAttribute('data-g'); mode='2p'; modesEl.querySelectorAll('.mode').forEach(function(m){ m.classList.toggle('active',m.getAttribute('data-m')==='2p'); }); resetScores(); configForGame(); }); });
+  modesEl.querySelectorAll('.mode').forEach(function(b){ b.addEventListener('click',function(){ modesEl.querySelectorAll('.mode').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); mode=b.getAttribute('data-m'); resetScores(); configForGame(); }); });
+  diffEl.querySelectorAll('.dbtn').forEach(function(b){ b.addEventListener('click',function(){ diffEl.querySelectorAll('.dbtn').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); difficulty=b.getAttribute('data-d'); startGame(); }); });
+  resetBtn.addEventListener('click',startGame);
 
   renderWhoami();
   if(!playerName) promptName();
-  setMode('2p');
+  configForGame();
 })();
 </script>
 </body>
