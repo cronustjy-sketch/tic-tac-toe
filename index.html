@@ -24,9 +24,6 @@
   .card{background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:1.5rem;box-shadow:0 18px 40px -20px var(--shadow);width:100%;max-width:460px;animation:drop .7s .1s ease both;}
   .whoami{text-align:center;font-weight:700;font-size:.82rem;color:var(--soft);margin-bottom:.75rem;}
   .whoami b{color:var(--ink);}.whoami a{color:var(--x);cursor:pointer;text-decoration:underline;}
-  .gamepick{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem;}
-  .gp{border:1px solid var(--line);background:var(--cream);cursor:pointer;font-family:inherit;font-weight:800;font-size:.9rem;color:var(--soft);padding:13px 6px;border-radius:14px;transition:.2s;}
-  .gp.active{background:var(--x-soft);color:var(--x);border-color:var(--x);}
   .modes{display:flex;gap:6px;background:var(--cream);padding:6px;border-radius:16px;margin-bottom:1rem;}
   .mode{flex:1;border:none;background:transparent;cursor:pointer;font-family:inherit;font-weight:800;font-size:.8rem;color:var(--soft);padding:11px 3px;border-radius:11px;transition:.25s;}
   .mode.active{background:var(--paper);color:var(--ink);box-shadow:0 4px 12px -6px var(--shadow);}
@@ -85,6 +82,25 @@
   .modal-card p{color:var(--soft);font-weight:600;font-size:.9rem;margin-bottom:1rem;}
   .modal-card input{width:100%;margin-bottom:1rem;text-align:center;font-family:inherit;font-size:1rem;font-weight:700;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--cream);}
   @keyframes drop{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+  .home{width:100%;max-width:620px;animation:drop .6s ease both;}
+  .home-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  @media(min-width:520px){.home-grid{grid-template-columns:repeat(3,1fr);}}
+  .tile{border:none;cursor:pointer;border-radius:24px;padding:0;overflow:hidden;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;font-family:'Fraunces',serif;font-weight:900;transition:transform .15s,box-shadow .15s;box-shadow:0 10px 24px -12px var(--shadow);position:relative;}
+  .tile:hover{transform:translateY(-4px);box-shadow:0 18px 34px -14px rgba(120,90,50,.3);}
+  .tile:active{transform:scale(.97);}
+  .tile .ico{font-size:3.2rem;line-height:1;}
+  .tile .tname{font-size:1.15rem;text-align:center;padding:0 8px;letter-spacing:-.01em;}
+  .tile .tsub{font-family:'Nunito',sans-serif;font-weight:700;font-size:.72rem;opacity:.92;background:rgba(255,255,255,.22);padding:3px 10px;border-radius:999px;}
+  .tile.t-ttt{background:linear-gradient(150deg,#e8843f,#d8662a);}
+  .tile.t-c4{background:linear-gradient(150deg,#3a6ea5,#2b5482);}
+  .tile.t-rps{background:linear-gradient(150deg,#4a9d8e,#357a6d);}
+  .tile.t-mem{background:linear-gradient(150deg,#b56db0,#8d4f89);}
+  .backbar{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+  .back-btn{border:1px solid var(--line);background:var(--cream);cursor:pointer;font-family:inherit;font-weight:800;font-size:.9rem;color:var(--ink);padding:9px 16px;border-radius:12px;display:inline-flex;align-items:center;gap:6px;}
+  .back-btn:active{transform:scale(.97);}
+  .gameview{display:none;}
+  .gameview.show{display:block;}
+  .home.hide{display:none;}
 </style>
 </head>
 <body>
@@ -94,15 +110,23 @@
     <span class="badge">&#9829; 100% free &amp; ad-free</span>
   </header>
 
-  <main class="card">
-    <div class="whoami" id="whoami"></div>
-
-    <div class="gamepick">
-      <button class="gp active" data-g="ttt">&#11093;&#10060; Tic-Tac-Toe</button>
-      <button class="gp" data-g="c4">&#128313; Connect 4</button>
-      <button class="gp" data-g="rps">&#9994; Rock Paper Scissors</button>
-      <button class="gp" data-g="mem">&#127183; Memory</button>
+  <div class="home" id="home">
+    <div class="whoami" id="whoamiHome"></div>
+    <div class="home-grid">
+      <button class="tile t-ttt" data-go="ttt"><span class="ico">&#11093;&#10060;</span><span class="tname">Tic-Tac-Toe</span><span class="tsub">vs CPU · online</span></button>
+      <button class="tile t-c4" data-go="c4"><span class="ico">&#128313;</span><span class="tname">Connect 4</span><span class="tsub">vs CPU · 2P</span></button>
+      <button class="tile t-rps" data-go="rps"><span class="ico">&#9994;</span><span class="tname">Rock Paper Scissors</span><span class="tsub">vs CPU</span></button>
+      <button class="tile t-mem" data-go="mem"><span class="ico">&#127183;</span><span class="tname">Memory</span><span class="tsub">solo</span></button>
     </div>
+    <button class="lb-toggle" id="lbToggleHome" style="margin-top:16px;">&#127942; Show leaderboard</button>
+    <div class="leaderboard" id="leaderboardHome">
+      <div class="lb-title">&#127942; Global Leaderboard</div>
+      <div id="lbListHome"><div class="lb-loading">Loading…</div></div>
+    </div>
+  </div>
+
+  <main class="card gameview" id="gameview">
+    <div class="backbar"><button class="back-btn" id="backBtn">&#8592; All games</button><div class="whoami" id="whoami" style="margin:0;flex:1;text-align:right;"></div></div>
 
     <div class="modes" id="modes">
       <button class="mode active" data-m="2p">Two players</button>
@@ -167,6 +191,8 @@
   var panel=document.getElementById('onlinePanel'),createBtn=document.getElementById('createBtn'),joinBtn=document.getElementById('joinBtn'),joinCode=document.getElementById('joinCode');
   var scA=document.getElementById('scA'),scB=document.getElementById('scB'),scD=document.getElementById('scD'),lblA=document.getElementById('lblA'),lblB=document.getElementById('lblB');
   var whoami=document.getElementById('whoami'),lbToggle=document.getElementById('lbToggle'),leaderboard=document.getElementById('leaderboard'),lbList=document.getElementById('lbList');
+  var homeEl=document.getElementById('home'),gameviewEl=document.getElementById('gameview'),backBtn=document.getElementById('backBtn');
+  var whoamiHome=document.getElementById('whoamiHome'),lbToggleHome=document.getElementById('lbToggleHome'),leaderboardHome=document.getElementById('leaderboardHome'),lbListHome=document.getElementById('lbListHome');
   var nameModal=document.getElementById('nameModal'),nameInput=document.getElementById('nameInput'),nameSave=document.getElementById('nameSave');
   var scores={a:0,b:0,d:0};
   var areas={ttt:document.getElementById('area-ttt'),c4:document.getElementById('area-c4'),rps:document.getElementById('area-rps'),mem:document.getElementById('area-mem')};
@@ -177,29 +203,30 @@
   function saveName(n){ try{localStorage.setItem('cg_name',n);}catch(e){} playerName=n; renderWhoami(); }
   function escapeHtml(s){ return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function renderWhoami(){
-    if(playerName){ whoami.innerHTML='Playing as <b>'+escapeHtml(playerName)+'</b> · <a id="cn">change</a>'; }
-    else { whoami.innerHTML='<a id="cn">Set your name for the leaderboard</a>'; }
-    var cn=document.getElementById('cn'); if(cn) cn.addEventListener('click',promptName);
+    var inner = playerName ? 'Playing as <b>'+escapeHtml(playerName)+'</b> · <a class="cn">change</a>' : '<a class="cn">Set your name for the leaderboard</a>';
+    whoami.innerHTML=inner; whoamiHome.innerHTML=inner;
+    document.querySelectorAll('.cn').forEach(function(a){ a.addEventListener('click',promptName); });
   }
   function promptName(){ nameInput.value=playerName||''; nameModal.classList.add('show'); nameInput.focus(); }
   nameSave.addEventListener('click',function(){ var v=(nameInput.value||'').trim().slice(0,20); if(v){ saveName(v); nameModal.classList.remove('show'); } });
 
-  function reportWin(){ if(!playerName) return; fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:playerName,result:'win'})}).then(function(){ if(leaderboard.classList.contains('show')) loadLeaderboard(); }).catch(function(){}); }
-  function reportResult(r){ if(!playerName) return; fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:playerName,result:r})}).then(function(){ if(leaderboard.classList.contains('show')) loadLeaderboard(); }).catch(function(){}); }
+  function reportWin(){ if(!playerName) return; fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:playerName,result:'win'})}).then(function(){ if(leaderboard.classList.contains('show')||leaderboardHome.classList.contains('show')) loadLeaderboard(); }).catch(function(){}); }
+  function reportResult(r){ if(!playerName) return; fetch(LEADERBOARD_URL+'/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:playerName,result:r})}).then(function(){ if(leaderboard.classList.contains('show')||leaderboardHome.classList.contains('show')) loadLeaderboard(); }).catch(function(){}); }
   function loadLeaderboard(){
-    lbList.innerHTML='<div class="lb-loading">Loading…</div>';
+    lbList.innerHTML='<div class="lb-loading">Loading…</div>'; lbListHome.innerHTML='<div class="lb-loading">Loading…</div>';
     fetch(LEADERBOARD_URL+'/scores').then(function(r){return r.json();}).then(function(data){
       var players=(data&&data.players)||[];
-      if(!players.length){ lbList.innerHTML='<div class="lb-empty">No scores yet — be the first!</div>'; return; }
-      var html='';
-      players.slice(0,10).forEach(function(p,idx){
+      var html;
+      if(!players.length){ html='<div class="lb-empty">No scores yet — be the first!</div>'; }
+      else { html=''; players.slice(0,10).forEach(function(p,idx){
         var medal=idx===0?'\uD83E\uDD47':idx===1?'\uD83E\uDD48':idx===2?'\uD83E\uDD49':(idx+1);
         html+='<div class="lb-row"><div class="lb-rank">'+medal+'</div><div class="lb-name">'+escapeHtml(p.name||'?')+'</div><div class="lb-wins">'+(p.wins||0)+' wins</div></div>';
-      });
-      lbList.innerHTML=html;
-    }).catch(function(){ lbList.innerHTML='<div class="lb-empty">Could not load leaderboard.</div>'; });
+      }); }
+      lbList.innerHTML=html; lbListHome.innerHTML=html;
+    }).catch(function(){ var e='<div class="lb-empty">Could not load leaderboard.</div>'; lbList.innerHTML=e; lbListHome.innerHTML=e; });
   }
   lbToggle.addEventListener('click',function(){ var show=!leaderboard.classList.contains('show'); leaderboard.classList.toggle('show',show); lbToggle.innerHTML=show?'&#127942; Hide leaderboard':'&#127942; Show leaderboard'; if(show) loadLeaderboard(); });
+  lbToggleHome.addEventListener('click',function(){ var show=!leaderboardHome.classList.contains('show'); leaderboardHome.classList.toggle('show',show); lbToggleHome.innerHTML=show?'&#127942; Hide leaderboard':'&#127942; Show leaderboard'; if(show) loadLeaderboard(); });
 
   function resetScores(){ scores={a:0,b:0,d:0}; scA.textContent=0;scB.textContent=0;scD.textContent=0; }
   function setLabels(a,b){ lblA.textContent=a; lblB.textContent=b; }
@@ -301,14 +328,17 @@
   }
   function startGame(){ if(game==='ttt') tttNew(true); else if(game==='c4') c4New(); else if(game==='rps') rpsNew(); else if(game==='mem') memNew(); }
 
-  document.querySelectorAll('.gp').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('.gp').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); game=b.getAttribute('data-g'); mode='2p'; modesEl.querySelectorAll('.mode').forEach(function(m){ m.classList.toggle('active',m.getAttribute('data-m')==='2p'); }); resetScores(); configForGame(); }); });
+  function openGame(g){ game=g; mode='2p'; modesEl.querySelectorAll('.mode').forEach(function(m){ m.classList.toggle('active',m.getAttribute('data-m')==='2p'); }); resetScores(); homeEl.classList.add('hide'); gameviewEl.classList.add('show'); configForGame(); window.scrollTo(0,0); }
+  function goHome(){ closeWs(); gameviewEl.classList.remove('show'); homeEl.classList.remove('hide'); window.scrollTo(0,0); }
+  document.querySelectorAll('.tile').forEach(function(b){ b.addEventListener('click',function(){ openGame(b.getAttribute('data-go')); }); });
+  backBtn.addEventListener('click',goHome);
   modesEl.querySelectorAll('.mode').forEach(function(b){ b.addEventListener('click',function(){ modesEl.querySelectorAll('.mode').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); mode=b.getAttribute('data-m'); resetScores(); configForGame(); }); });
   diffEl.querySelectorAll('.dbtn').forEach(function(b){ b.addEventListener('click',function(){ diffEl.querySelectorAll('.dbtn').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); difficulty=b.getAttribute('data-d'); startGame(); }); });
   resetBtn.addEventListener('click',startGame);
 
   renderWhoami();
   if(!playerName) promptName();
-  configForGame();
+  goHome();
 })();
 </script>
 </body>
