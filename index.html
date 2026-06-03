@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cronus Games — friendly, ad-free games</title>
-<meta name="description" content="A small collection of free, ad-free games: tic-tac-toe (with online play), Connect 4, Rock Paper Scissors and Memory. Play a friend or the computer, climb the leaderboard.">
+<meta name="description" content="A small collection of free, ad-free games: tic-tac-toe (with online play & chat), Connect 4, Rock Paper Scissors and Memory. Play a friend or the computer, climb the leaderboard.">
 <link rel="canonical" href="https://game.cronuschores.xyz/">
 <meta property="og:title" content="Cronus Games — friendly, ad-free games">
 <meta property="og:description" content="Free games, no ads. Tic-tac-toe, Connect 4, Rock Paper Scissors and Memory with a global leaderboard.">
@@ -36,6 +36,17 @@
   .obtn{border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:.95rem;padding:12px;border-radius:12px;transition:.2s;}
   .obtn.primary{background:var(--x);color:#fff;}.obtn.secondary{background:var(--cream);color:var(--ink);border:1px solid var(--line);}
   .room-tag{text-align:center;font-weight:800;color:var(--o);background:var(--o-soft);padding:8px;border-radius:10px;font-size:.9rem;letter-spacing:.08em;margin-bottom:1rem;}
+  .chat{display:none;flex-direction:column;margin-bottom:1.25rem;border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .chat.show{display:flex;}
+  .chat-log{height:140px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;background:var(--cream);}
+  .chat-msg{max-width:80%;padding:7px 11px;border-radius:14px;font-size:.85rem;font-weight:600;line-height:1.3;word-wrap:break-word;}
+  .chat-msg.me{align-self:flex-end;background:var(--x);color:#fff;border-bottom-right-radius:4px;}
+  .chat-msg.them{align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-bottom-left-radius:4px;}
+  .chat-empty{text-align:center;color:var(--soft);font-size:.8rem;font-weight:700;margin:auto;}
+  .chat-input-row{display:flex;gap:6px;padding:8px;background:var(--paper);border-top:1px solid var(--line);}
+  .chat-input-row input{flex:1;font-family:inherit;font-size:.9rem;font-weight:600;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--cream);color:var(--ink);}
+  .chat-input-row input:focus{outline:none;border-color:var(--x);}
+  .chat-send{border:none;background:var(--x);color:#fff;cursor:pointer;font-family:inherit;font-weight:800;padding:9px 16px;border-radius:10px;}
   .or{text-align:center;color:var(--soft);font-weight:700;font-size:.8rem;}
   .status{text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:1.35rem;min-height:2rem;margin-bottom:1.1rem;}
   .ttt-board{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.25rem;}
@@ -113,7 +124,7 @@
   <div class="home" id="home">
     <div class="whoami" id="whoamiHome"></div>
     <div class="home-grid">
-      <button class="tile t-ttt" data-go="ttt"><span class="ico">&#11093;&#10060;</span><span class="tname">Tic-Tac-Toe</span><span class="tsub">vs CPU · online</span></button>
+      <button class="tile t-ttt" data-go="ttt"><span class="ico">&#11093;&#10060;</span><span class="tname">Tic-Tac-Toe</span><span class="tsub">vs CPU · online · chat</span></button>
       <button class="tile t-c4" data-go="c4"><span class="ico">&#128313;</span><span class="tname">Connect 4</span><span class="tsub">vs CPU · 2P</span></button>
       <button class="tile t-rps" data-go="rps"><span class="ico">&#9994;</span><span class="tname">Rock Paper Scissors</span><span class="tsub">vs CPU</span></button>
       <button class="tile t-mem" data-go="mem"><span class="ico">&#127183;</span><span class="tname">Memory</span><span class="tsub">solo</span></button>
@@ -145,6 +156,14 @@
       <div class="or">— or join a friend —</div>
       <input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off">
       <button class="obtn secondary" id="joinBtn">Join room</button>
+    </div>
+
+    <div class="chat" id="chat">
+      <div class="chat-log" id="chatLog"><div class="chat-empty">Say hi to your opponent! 👋</div></div>
+      <div class="chat-input-row">
+        <input id="chatInput" maxlength="200" placeholder="Type a message…" autocomplete="off">
+        <button class="chat-send" id="chatSend">Send</button>
+      </div>
     </div>
 
     <div class="status" id="status"></div>
@@ -194,6 +213,7 @@
   var homeEl=document.getElementById('home'),gameviewEl=document.getElementById('gameview'),backBtn=document.getElementById('backBtn');
   var whoamiHome=document.getElementById('whoamiHome'),lbToggleHome=document.getElementById('lbToggleHome'),leaderboardHome=document.getElementById('leaderboardHome'),lbListHome=document.getElementById('lbListHome');
   var nameModal=document.getElementById('nameModal'),nameInput=document.getElementById('nameInput'),nameSave=document.getElementById('nameSave');
+  var chatEl=document.getElementById('chat'),chatLog=document.getElementById('chatLog'),chatInput=document.getElementById('chatInput'),chatSend=document.getElementById('chatSend');
   var scores={a:0,b:0,d:0};
   var areas={ttt:document.getElementById('area-ttt'),c4:document.getElementById('area-c4'),rps:document.getElementById('area-rps'),mem:document.getElementById('area-mem')};
   var ws=null,room=null,myMark=null,onlineConnected=false;
@@ -305,10 +325,15 @@
   function memFlip(i){ if(M.busy||M.flipped.indexOf(i)!==-1||M.matched.indexOf(i)!==-1) return; M.flipped.push(i); memRender(); if(M.flipped.length===2){ M.moves++; M.busy=true; var a=M.flipped[0],b=M.flipped[1]; if(M.cards[a]===M.cards[b]){ M.matched.push(a,b); M.flipped=[]; M.busy=false; memRender(); if(M.matched.length===M.cards.length){ scores.a++; scA.textContent=scores.a; statusEl.textContent='You won in '+M.moves+' moves! \uD83C\uDF89'; } else statusEl.textContent='Match! Keep going.'; } else { statusEl.textContent='Nope — try again'; setTimeout(function(){ M.flipped=[]; M.busy=false; memRender(); },750); } } }
 
   function randCode(){ var c='',a='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; for(var i=0;i<4;i++) c+=a[Math.floor(Math.random()*a.length)]; return c; }
+  function addChat(text,mine){ var empty=chatLog.querySelector('.chat-empty'); if(empty) empty.remove(); var m=document.createElement('div'); m.className='chat-msg '+(mine?'me':'them'); m.textContent=text; chatLog.appendChild(m); chatLog.scrollTop=chatLog.scrollHeight; }
+  function clearChat(){ chatLog.innerHTML='<div class="chat-empty">Say hi to your opponent! \uD83D\uDC4B</div>'; }
+  function sendChat(){ var t=(chatInput.value||'').trim().slice(0,200); if(!t||!onlineConnected) return; addChat(t,true); sendMsg({t:'chat',text:t}); chatInput.value=''; }
+  chatSend.addEventListener('click',sendChat);
+  chatInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); sendChat(); } });
   function connect(code,asHost){ room=code; myMark=asHost?'X':'O'; var url='wss://'+PIESOCKET_CLUSTER+'.piesocket.com/v3/'+code+'?api_key='+PIESOCKET_API_KEY+'&notify_self=0'; statusEl.textContent='Connecting…'; try{ ws=new WebSocket(url); }catch(e){ statusEl.textContent='Connection failed'; return; }
-    ws.onopen=function(){ onlineConnected=true; panel.classList.remove('show'); var tag=document.createElement('div'); tag.className='room-tag'; tag.id='roomTag'; tag.textContent='Room '+code+' · you are '+myMark; panel.parentNode.insertBefore(tag,statusEl); tttNew(false); statusEl.textContent=asHost?'Share code '+code+' — waiting…':'Joined! '+(T.current===myMark?'Your turn':"Friend's turn"); if(!asHost) sendMsg({t:'hello'}); };
-    ws.onmessage=function(ev){ var d; try{ d=JSON.parse(ev.data); }catch(e){ return; } if(!d||!d.t) return; if(d.t==='hello'){ if(myMark==='X'){ sendMsg({t:'welcome'}); statusEl.textContent='Friend joined! Your turn'; tttRender(); } return; } if(d.t==='welcome'){ statusEl.textContent="Friend's turn"; tttRender(); return; } if(d.t==='move'){ if(T.board[d.i]===''&&d.mark===T.current){ T.board[d.i]=d.mark; if(tttFinish()) return; T.current=T.current==='X'?'O':'X'; tttRender(); tttStatus(); } return; } if(d.t==='reset'){ T.board=Array(9).fill(''); T.current='X'; T.over=false; tttRender(); tttStatus(); return; } };
-    ws.onclose=function(){ onlineConnected=false; if(mode==='online'){ statusEl.textContent='Disconnected. Create or join again.'; var rt=document.getElementById('roomTag'); if(rt) rt.remove(); panel.classList.add('show'); } };
+    ws.onopen=function(){ onlineConnected=true; panel.classList.remove('show'); chatEl.classList.add('show'); clearChat(); var tag=document.createElement('div'); tag.className='room-tag'; tag.id='roomTag'; tag.textContent='Room '+code+' · you are '+myMark; panel.parentNode.insertBefore(tag,statusEl); tttNew(false); statusEl.textContent=asHost?'Share code '+code+' — waiting…':'Joined! '+(T.current===myMark?'Your turn':"Friend's turn"); if(!asHost) sendMsg({t:'hello'}); };
+    ws.onmessage=function(ev){ var d; try{ d=JSON.parse(ev.data); }catch(e){ return; } if(!d||!d.t) return; if(d.t==='chat'){ if(typeof d.text==='string') addChat(d.text.slice(0,200),false); return; } if(d.t==='hello'){ if(myMark==='X'){ sendMsg({t:'welcome'}); statusEl.textContent='Friend joined! Your turn'; tttRender(); } return; } if(d.t==='welcome'){ statusEl.textContent="Friend's turn"; tttRender(); return; } if(d.t==='move'){ if(T.board[d.i]===''&&d.mark===T.current){ T.board[d.i]=d.mark; if(tttFinish()) return; T.current=T.current==='X'?'O':'X'; tttRender(); tttStatus(); } return; } if(d.t==='reset'){ T.board=Array(9).fill(''); T.current='X'; T.over=false; tttRender(); tttStatus(); return; } };
+    ws.onclose=function(){ onlineConnected=false; chatEl.classList.remove('show'); if(mode==='online'){ statusEl.textContent='Disconnected. Create or join again.'; var rt=document.getElementById('roomTag'); if(rt) rt.remove(); panel.classList.add('show'); } };
     ws.onerror=function(){ statusEl.textContent='Connection error'; };
   }
   function sendMsg(o){ if(ws&&ws.readyState===1) ws.send(JSON.stringify(o)); }
@@ -316,7 +341,7 @@
   joinBtn.addEventListener('click',function(){ var c=(joinCode.value||'').toUpperCase().trim(); if(c.length<4){ statusEl.textContent='Enter the 4-letter code'; return; } connect(c,false); });
 
   function showArea(){ for(var k in areas){ areas[k].classList.toggle('hidden',k!==game); } }
-  function closeWs(){ if(ws){ try{ws.close();}catch(e){} ws=null; onlineConnected=false; } var rt=document.getElementById('roomTag'); if(rt) rt.remove(); }
+  function closeWs(){ if(ws){ try{ws.close();}catch(e){} ws=null; onlineConnected=false; } chatEl.classList.remove('show'); var rt=document.getElementById('roomTag'); if(rt) rt.remove(); }
   function configForGame(){
     showArea(); closeWs(); panel.classList.remove('show');
     onlineBtn.classList.toggle('hidden',game!=='ttt');
