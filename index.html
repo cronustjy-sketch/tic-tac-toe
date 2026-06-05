@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cronus Game Hub — friendly, ad-free games</title>
-<meta name="description" content="A small collection of free, ad-free games: tic-tac-toe (with online play & chat), Connect 4, Rock Paper Scissors and Memory. Play a friend or the computer, climb the leaderboard.">
+<meta name="description" content="A small collection of free, ad-free games: tic-tac-toe (with online play & chat), Connect 4, Rock Paper Scissors, Memory and Checkers. Play a friend or the computer, climb the leaderboard.">
 <link rel="canonical" href="https://game.cronuschores.xyz/">
 <meta property="og:title" content="Cronus Game Hub — friendly, ad-free games">
-<meta property="og:description" content="Free games, no ads. Tic-tac-toe, Connect 4, Rock Paper Scissors and Memory with a global leaderboard.">
+<meta property="og:description" content="Free games, no ads. Tic-tac-toe, Connect 4, Rock Paper Scissors, Memory and Checkers with a global leaderboard.">
 <meta property="og:url" content="https://game.cronuschores.xyz/">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#e8843f">
@@ -75,6 +75,17 @@
   .mem-card{aspect-ratio:1;border:none;cursor:pointer;background:var(--x);border-radius:14px;font-size:1.8rem;display:flex;align-items:center;justify-content:center;transition:.2s;color:transparent;}
   .mem-card.flip{background:var(--cream);color:var(--ink);}
   .mem-card.matched{background:var(--o-soft);color:var(--ink);cursor:default;}
+  .tile.t-chk{background:linear-gradient(150deg,#c0392b,#7d241b);}
+  .chk-board{display:grid;grid-template-columns:repeat(8,1fr);gap:0;margin-bottom:1.25rem;border-radius:14px;overflow:hidden;border:3px solid var(--ink);}
+  .chk-sq{aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+  .chk-sq.light{background:#f0d9b5;}
+  .chk-sq.dark{background:#9c6b3f;}
+  .chk-sq.sel{box-shadow:inset 0 0 0 4px var(--yellow);}
+  .chk-sq.target::after{content:'';position:absolute;width:30%;height:30%;border-radius:50%;background:rgba(74,157,142,.7);}
+  .chk-pc{width:74%;height:74%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 3px 6px rgba(0,0,0,.35);}
+  .chk-pc.r{background:radial-gradient(circle at 35% 30%,#e8654f,#c0392b);}
+  .chk-pc.b{background:radial-gradient(circle at 35% 30%,#555,#222);}
+  .chk-pc.king::after{content:'\265B';color:rgba(255,255,255,.92);font-size:1.1rem;}
   .scores{display:flex;gap:10px;margin-bottom:1.25rem;}
   .score{flex:1;text-align:center;background:var(--cream);border-radius:16px;padding:.85rem;}
   .score .lbl{font-size:.76rem;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.04em;}
@@ -134,6 +145,7 @@
       <button class="tile t-c4" data-go="c4"><span class="ico">&#128313;</span><span class="tname">Connect 4</span><span class="tsub">vs CPU · 2P</span></button>
       <button class="tile t-rps" data-go="rps"><span class="ico">&#9994;</span><span class="tname">Rock Paper Scissors</span><span class="tsub">vs CPU</span></button>
       <button class="tile t-mem" data-go="mem"><span class="ico">&#127183;</span><span class="tname">Memory</span><span class="tsub">solo</span></button>
+      <button class="tile t-chk" data-go="chk"><span class="ico">&#9899;</span><span class="tname">Checkers</span><span class="tsub">vs CPU · 2P</span></button>
     </div>
     <button class="lb-toggle" id="lbToggleHome" style="margin-top:16px;">&#127942; Show leaderboard</button>
     <div class="leaderboard" id="leaderboardHome">
@@ -178,6 +190,7 @@
     <div id="area-c4" class="hidden"></div>
     <div id="area-rps" class="hidden"></div>
     <div id="area-mem" class="hidden"></div>
+    <div id="area-chk" class="hidden"></div>
 
     <div class="scores" id="scores">
       <div class="score"><div class="lbl" id="lblA">P1</div><div class="val" id="scA">0</div></div>
@@ -221,7 +234,7 @@
   var nameModal=document.getElementById('nameModal'),nameInput=document.getElementById('nameInput'),nameSave=document.getElementById('nameSave');
   var chatEl=document.getElementById('chat'),chatLog=document.getElementById('chatLog'),chatInput=document.getElementById('chatInput'),chatSend=document.getElementById('chatSend');
   var scores={a:0,b:0,d:0};
-  var areas={ttt:document.getElementById('area-ttt'),c4:document.getElementById('area-c4'),rps:document.getElementById('area-rps'),mem:document.getElementById('area-mem')};
+  var areas={ttt:document.getElementById('area-ttt'),c4:document.getElementById('area-c4'),rps:document.getElementById('area-rps'),mem:document.getElementById('area-mem'),chk:document.getElementById('area-chk')};
   var ws=null,room=null,myMark=null,onlineConnected=false;
 
   var playerName=getName();
@@ -330,6 +343,45 @@
   function memRender(){ var html='<div class="mem-board">'; for(var i=0;i<M.cards.length;i++){ var shown=M.flipped.indexOf(i)!==-1||M.matched.indexOf(i)!==-1; html+='<button class="mem-card'+(M.matched.indexOf(i)!==-1?' matched':shown?' flip':'')+'" data-i="'+i+'">'+(shown?M.cards[i]:'')+'</button>'; } html+='</div>'; areas.mem.innerHTML=html; areas.mem.querySelectorAll('.mem-card').forEach(function(b){ b.addEventListener('click',function(){ memFlip(parseInt(b.getAttribute('data-i'),10)); }); }); }
   function memFlip(i){ if(M.busy||M.flipped.indexOf(i)!==-1||M.matched.indexOf(i)!==-1) return; M.flipped.push(i); memRender(); if(M.flipped.length===2){ M.moves++; M.busy=true; var a=M.flipped[0],b=M.flipped[1]; if(M.cards[a]===M.cards[b]){ M.matched.push(a,b); M.flipped=[]; M.busy=false; memRender(); if(M.matched.length===M.cards.length){ scores.a++; scA.textContent=scores.a; statusEl.textContent='You won in '+M.moves+' moves! \uD83C\uDF89'; } else statusEl.textContent='Match! Keep going.'; } else { statusEl.textContent='Nope — try again'; setTimeout(function(){ M.flipped=[]; M.busy=false; memRender(); },750); } } }
 
+  // CHECKERS (casual: captures optional, multi-jumps allowed, kings move 1 any diagonal)
+  var CK={board:[],turn:'r',sel:-1,targets:[],over:false,chain:false};
+  function ckSide(p){ if(p==='r'||p==='R') return 'r'; if(p==='b'||p==='B') return 'b'; return null; }
+  function ckKing(p){ return p==='R'||p==='B'; }
+  function ckDirs(p){ if(p==='r') return [[-1,-1],[-1,1]]; if(p==='b') return [[1,-1],[1,1]]; return [[-1,-1],[-1,1],[1,-1],[1,1]]; }
+  function ckIn(r,c){ return r>=0&&r<8&&c>=0&&c<8; }
+  function ckSimple(b,idx){ var r=(idx/8)|0,c=idx%8,p=b[idx],out=[]; ckDirs(p).forEach(function(d){ var nr=r+d[0],nc=c+d[1]; if(ckIn(nr,nc)&&b[nr*8+nc]===''){ out.push({from:idx,to:nr*8+nc,cap:null}); } }); return out; }
+  function ckCaps(b,idx){ var r=(idx/8)|0,c=idx%8,p=b[idx],side=ckSide(p),out=[]; ckDirs(p).forEach(function(d){ var mr=r+d[0],mc=c+d[1],jr=r+2*d[0],jc=c+2*d[1]; if(ckIn(jr,jc)&&ckIn(mr,mc)&&b[jr*8+jc]===''){ var mid=b[mr*8+mc]; if(mid!==''&&ckSide(mid)!==side){ out.push({from:idx,to:jr*8+jc,cap:mr*8+mc}); } } }); return out; }
+  function ckAll(b,side){ var caps=[],simples=[]; for(var i=0;i<64;i++){ if(ckSide(b[i])!==side) continue; ckCaps(b,i).forEach(function(m){caps.push(m);}); ckSimple(b,i).forEach(function(m){simples.push(m);}); } return {caps:caps,simples:simples}; }
+  function ckApply(b,m){ b=b.slice(); var p=b[m.from]; b[m.from]=''; if(m.cap!==null) b[m.cap]=''; b[m.to]=p; var tr=(m.to/8)|0,promoted=false; if(p==='r'&&tr===0){ b[m.to]='R'; promoted=true; } if(p==='b'&&tr===7){ b[m.to]='B'; promoted=true; } var more=[]; if(m.cap!==null&&!promoted) more=ckCaps(b,m.to); return {board:b,more:more,promoted:promoted}; }
+  function ckWinner(b){ var red=0,black=0; for(var i=0;i<64;i++){ if(b[i]==='r'||b[i]==='R')red++; else if(b[i]==='b'||b[i]==='B')black++; } if(red===0) return 'b'; if(black===0) return 'r'; var rm=ckAll(b,'r'); if(rm.caps.length+rm.simples.length===0) return 'b'; var bm=ckAll(b,'b'); if(bm.caps.length+bm.simples.length===0) return 'r'; return null; }
+  function ckNew(){ var b=Array(64).fill(''); for(var r=0;r<8;r++)for(var c=0;c<8;c++){ if((r+c)%2===1){ if(r<3) b[r*8+c]='b'; else if(r>4) b[r*8+c]='r'; } } CK.board=b; CK.turn='r'; CK.sel=-1; CK.targets=[]; CK.over=false; CK.chain=false; ckRender(); ckStatus(); }
+  function ckStatus(){ if(CK.over) return; if(mode==='cpu') statusEl.textContent=(CK.turn==='r')?'Your turn (red)':'Computer thinking…'; else statusEl.textContent=(CK.turn==='r'?'Red':'Black')+"'s turn"; }
+  function ckRender(){ var html='<div class="chk-board">'; for(var r=0;r<8;r++)for(var c=0;c<8;c++){ var idx=r*8+c,dark=(r+c)%2===1,p=CK.board[idx]; var cls='chk-sq '+(dark?'dark':'light'); if(idx===CK.sel) cls+=' sel'; if(CK.targets.indexOf(idx)!==-1) cls+=' target'; html+='<div class="'+cls+'" data-i="'+idx+'">'; if(p){ html+='<div class="chk-pc '+ckSide(p)+(ckKing(p)?' king':'')+'"></div>'; } html+='</div>'; } html+='</div>'; areas.chk.innerHTML=html; areas.chk.querySelectorAll('.chk-sq').forEach(function(s){ s.addEventListener('click',function(){ ckClick(parseInt(s.getAttribute('data-i'),10)); }); }); }
+  function ckMovesFrom(idx){ var caps=ckCaps(CK.board,idx),simples=ckSimple(CK.board,idx); return CK.chain?caps:caps.concat(simples); }
+  function ckClick(idx){ if(CK.over) return; if(mode==='cpu'&&CK.turn==='b') return; var p=CK.board[idx];
+    if(CK.sel!==-1){ var mv=ckMovesFrom(CK.sel).filter(function(m){return m.to===idx;})[0]; if(mv){ ckDoMove(mv); return; } }
+    if(CK.chain) return;
+    if(p&&ckSide(p)===CK.turn){ CK.sel=idx; CK.targets=ckMovesFrom(idx).map(function(m){return m.to;}); ckRender(); } else { CK.sel=-1; CK.targets=[]; ckRender(); } }
+  function ckDoMove(m){ var res=ckApply(CK.board,m); CK.board=res.board;
+    if(m.cap!==null&&res.more.length){ CK.sel=m.to; CK.targets=res.more.map(function(x){return x.to;}); CK.chain=true; ckRender(); statusEl.textContent='Keep jumping!'; return; }
+    CK.sel=-1; CK.targets=[]; CK.chain=false; ckRender();
+    var w=ckWinner(CK.board); if(w){ ckEnd(w); return; }
+    CK.turn=CK.turn==='r'?'b':'r'; ckStatus();
+    if(mode==='cpu'&&CK.turn==='b'){ setTimeout(ckCpu,500); }
+  }
+  function ckEnd(w){ CK.over=true; if(mode==='cpu'){ if(w==='r'){ scores.a++; scA.textContent=scores.a; statusEl.textContent='You win! \uD83C\uDF89'; reportWin(); } else { scores.b++; scB.textContent=scores.b; statusEl.textContent='Computer wins!'; reportResult('loss'); } } else { if(w==='r'){ scores.a++; scA.textContent=scores.a; statusEl.textContent='Red wins! \uD83C\uDF89'; } else { scores.b++; scB.textContent=scores.b; statusEl.textContent='Black wins! \uD83C\uDF89'; } } }
+  function ckCpu(){ if(CK.over) return; var mv=ckAll(CK.board,'b'),pick=null;
+    if(difficulty==='easy'){ var all=mv.caps.concat(mv.simples); pick=all[Math.floor(Math.random()*all.length)]; }
+    else if(difficulty==='medium'){ pick=mv.caps.length?mv.caps[Math.floor(Math.random()*mv.caps.length)]:mv.simples[Math.floor(Math.random()*mv.simples.length)]; }
+    else { if(mv.caps.length){ var best=mv.caps[0],bs=-1; mv.caps.forEach(function(m){ var r=ckApply(CK.board,m); var sc=1+r.more.length+(r.promoted?1:0); if(sc>bs){bs=sc;best=m;} }); pick=best; } else if(mv.simples.length){ var safe=mv.simples.filter(function(m){ var r=ckApply(CK.board,m); return ckAll(r.board,'r').caps.length===0; }); var pool=safe.length?safe:mv.simples; pick=pool[Math.floor(Math.random()*pool.length)]; } }
+    if(!pick){ ckEnd(ckWinner(CK.board)||'r'); return; }
+    var res=ckApply(CK.board,pick); CK.board=res.board; ckRender();
+    while(pick.cap!==null&&res.more.length){ var nm=res.more[0]; if(difficulty!=='easy'){ var b2=-1; res.more.forEach(function(m){ var rr=ckApply(CK.board,m); var sc=1+rr.more.length; if(sc>b2){b2=sc;nm=m;} }); } res=ckApply(CK.board,nm); CK.board=res.board; pick=nm; ckRender(); }
+    var w=ckWinner(CK.board); if(w){ ckEnd(w); return; }
+    CK.turn='r'; ckStatus();
+  }
+
+  // ONLINE (tic-tac-toe only)
   function randCode(){ var c='',a='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; for(var i=0;i<4;i++) c+=a[Math.floor(Math.random()*a.length)]; return c; }
   function addChat(text,mine){ var empty=chatLog.querySelector('.chat-empty'); if(empty) empty.remove(); var m=document.createElement('div'); m.className='chat-msg '+(mine?'me':'them'); m.textContent=text; chatLog.appendChild(m); chatLog.scrollTop=chatLog.scrollHeight; }
   function clearChat(){ chatLog.innerHTML='<div class="chat-empty">Say hi to your opponent! \uD83D\uDC4B</div>'; }
@@ -355,9 +407,10 @@
     else if(game==='c4'){ modesEl.classList.remove('hidden'); diffEl.classList.toggle('hidden',mode!=='cpu'); setLabels(mode==='cpu'?'You':'Red',mode==='cpu'?'CPU':'Yellow'); }
     else if(game==='rps'){ modesEl.classList.add('hidden'); diffEl.classList.add('hidden'); setLabels('You','CPU'); }
     else if(game==='mem'){ modesEl.classList.add('hidden'); diffEl.classList.add('hidden'); setLabels('Wins','—'); }
+    else if(game==='chk'){ modesEl.classList.remove('hidden'); diffEl.classList.toggle('hidden',mode!=='cpu'); setLabels(mode==='cpu'?'You':'Red',mode==='cpu'?'CPU':'Black'); }
     startGame();
   }
-  function startGame(){ if(game==='ttt') tttNew(true); else if(game==='c4') c4New(); else if(game==='rps') rpsNew(); else if(game==='mem') memNew(); }
+  function startGame(){ if(game==='ttt') tttNew(true); else if(game==='c4') c4New(); else if(game==='rps') rpsNew(); else if(game==='mem') memNew(); else if(game==='chk') ckNew(); }
 
   function openGame(g){ game=g; mode='2p'; modesEl.querySelectorAll('.mode').forEach(function(m){ m.classList.toggle('active',m.getAttribute('data-m')==='2p'); }); resetScores(); homeEl.classList.add('hide'); gameviewEl.classList.add('show'); configForGame(); window.scrollTo(0,0); }
   function goHome(){ closeWs(); gameviewEl.classList.remove('show'); homeEl.classList.remove('hide'); window.scrollTo(0,0); }
