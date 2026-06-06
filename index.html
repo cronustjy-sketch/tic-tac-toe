@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cronus Game Hub — friendly, ad-free games</title>
-<meta name="description" content="A small collection of free, ad-free games: tic-tac-toe (with online play & chat), Connect 4, Rock Paper Scissors, Memory and Checkers. Play a friend or the computer, climb the leaderboard.">
+<meta name="description" content="A small collection of free, ad-free games: tic-tac-toe (with online play & chat), Connect 4, Rock Paper Scissors, Memory, Checkers and Battleship. Play a friend or the computer, climb the leaderboard.">
 <link rel="canonical" href="https://game.cronuschores.xyz/">
 <meta property="og:title" content="Cronus Game Hub — friendly, ad-free games">
-<meta property="og:description" content="Free games, no ads. Tic-tac-toe, Connect 4, Rock Paper Scissors, Memory and Checkers with a global leaderboard.">
+<meta property="og:description" content="Free games, no ads. Tic-tac-toe, Connect 4, Rock Paper Scissors, Memory, Checkers and Battleship with a global leaderboard.">
 <meta property="og:url" content="https://game.cronuschores.xyz/">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#e8843f">
@@ -86,6 +86,22 @@
   .chk-pc.r{background:radial-gradient(circle at 35% 30%,#e8654f,#c0392b);}
   .chk-pc.b{background:radial-gradient(circle at 35% 30%,#555,#222);}
   .chk-pc.king::after{content:'\265B';color:rgba(255,255,255,.92);font-size:1.1rem;}
+  .tile.t-bs{background:linear-gradient(150deg,#2a7d8c,#16505c);}
+  .bs-wrap{display:flex;flex-direction:column;gap:12px;margin-bottom:1.1rem;}
+  .bs-label{font-weight:800;font-size:.82rem;color:var(--soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;text-align:center;}
+  .bs-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;background:var(--line);border:2px solid var(--ink);border-radius:8px;padding:3px;}
+  .bs-cell{aspect-ratio:1;background:#bfe3ea;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;}
+  .bs-cell.ship{background:#6b7785;}
+  .bs-cell.miss{background:#d9eef2;}
+  .bs-cell.miss::after{content:'\00b7';color:#7a8a90;font-size:1.2rem;}
+  .bs-cell.hit{background:#e8843f;}
+  .bs-cell.hit::after{content:'\2715';color:#fff;font-weight:900;}
+  .bs-cell.sunk{background:#c0392b;}
+  .bs-cell.sunk::after{content:'\2715';color:#fff;font-weight:900;}
+  .bs-fire .bs-cell:hover{outline:2px solid var(--x);}
+  .bs-fire.locked{opacity:.6;pointer-events:none;}
+  .bs-setup-row{display:flex;gap:8px;margin-bottom:1rem;}
+  .bs-setup-row .obtn{flex:1;}
   .scores{display:flex;gap:10px;margin-bottom:1.25rem;}
   .score{flex:1;text-align:center;background:var(--cream);border-radius:16px;padding:.85rem;}
   .score .lbl{font-size:.76rem;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.04em;}
@@ -146,6 +162,7 @@
       <button class="tile t-rps" data-go="rps"><span class="ico">&#9994;</span><span class="tname">Rock Paper Scissors</span><span class="tsub">vs CPU</span></button>
       <button class="tile t-mem" data-go="mem"><span class="ico">&#127183;</span><span class="tname">Memory</span><span class="tsub">solo</span></button>
       <button class="tile t-chk" data-go="chk"><span class="ico">&#9899;</span><span class="tname">Checkers</span><span class="tsub">vs CPU · 2P</span></button>
+      <button class="tile t-bs" data-go="bs"><span class="ico">&#128674;</span><span class="tname">Battleship</span><span class="tsub">vs CPU</span></button>
     </div>
     <button class="lb-toggle" id="lbToggleHome" style="margin-top:16px;">&#127942; Show leaderboard</button>
     <div class="leaderboard" id="leaderboardHome">
@@ -191,6 +208,7 @@
     <div id="area-rps" class="hidden"></div>
     <div id="area-mem" class="hidden"></div>
     <div id="area-chk" class="hidden"></div>
+    <div id="area-bs" class="hidden"></div>
 
     <div class="scores" id="scores">
       <div class="score"><div class="lbl" id="lblA">P1</div><div class="val" id="scA">0</div></div>
@@ -234,7 +252,7 @@
   var nameModal=document.getElementById('nameModal'),nameInput=document.getElementById('nameInput'),nameSave=document.getElementById('nameSave');
   var chatEl=document.getElementById('chat'),chatLog=document.getElementById('chatLog'),chatInput=document.getElementById('chatInput'),chatSend=document.getElementById('chatSend');
   var scores={a:0,b:0,d:0};
-  var areas={ttt:document.getElementById('area-ttt'),c4:document.getElementById('area-c4'),rps:document.getElementById('area-rps'),mem:document.getElementById('area-mem'),chk:document.getElementById('area-chk')};
+  var areas={ttt:document.getElementById('area-ttt'),c4:document.getElementById('area-c4'),rps:document.getElementById('area-rps'),mem:document.getElementById('area-mem'),chk:document.getElementById('area-chk'),bs:document.getElementById('area-bs')};
   var ws=null,room=null,myMark=null,onlineConnected=false;
 
   var playerName=getName();
@@ -381,6 +399,58 @@
     CK.turn='r'; ckStatus();
   }
 
+  // BATTLESHIP (vs CPU; auto + manual placement; Easy/Medium/Hard hunting AI)
+  var BSN=10, BSFLEET=[5,4,3,3,2];
+  var BS={phase:'setup',myShips:[],myOcc:{},foeShips:[],foeOcc:[],myShots:{},foeShots:{},place:{orient:'h',shipIdx:0,cells:[]},ai:null,over:false};
+  function bsIdx(r,c){return r*BSN+c;}
+  function bsIn(r,c){return r>=0&&r<BSN&&c>=0&&c<BSN;}
+  function bsPlaceRandom(){ var occ={},ships=[]; for(var s=0;s<BSFLEET.length;s++){ var len=BSFLEET[s],placed=false,tries=0; while(!placed&&tries<800){ tries++; var horiz=Math.random()<0.5,r=Math.floor(Math.random()*BSN),c=Math.floor(Math.random()*BSN),cells=[],ok=true; for(var k=0;k<len;k++){ var rr=horiz?r:r+k,cc=horiz?c+k:c; if(!bsIn(rr,cc)||occ[bsIdx(rr,cc)]!==undefined){ok=false;break;} cells.push(bsIdx(rr,cc)); } if(ok){ var si=ships.length; cells.forEach(function(x){occ[x]=si;}); ships.push({len:len,cells:cells,hits:0}); placed=true; } } if(!placed) return null; } return {ships:ships,occ:occ}; }
+  function bsPlaceRandomSafe(){ var p=null; while(!p) p=bsPlaceRandom(); return p; }
+  function bsNew(){ BS.phase='setup'; BS.over=false; var p=bsPlaceRandomSafe(); BS.myShips=p.ships; BS.myOcc=p.occ; BS.myShots={}; BS.foeShots={}; var f=bsPlaceRandomSafe(); BS.foeShips=f.ships; BS.foeOcc=f.occ; BS.ai={diff:difficulty,tried:{},queue:[]}; BS.place={orient:'h',shipIdx:0,cells:[]}; bsRenderSetup(); }
+  function bsRenderSetup(){
+    var h='<div class="bs-setup-row"><button class="obtn primary" id="bsShuffle">Shuffle</button><button class="obtn secondary" id="bsStart">Start game</button></div>';
+    h+='<div class="bs-wrap"><div><div class="bs-label">Your fleet</div><div class="bs-grid" id="bsMy">';
+    for(var i=0;i<BSN*BSN;i++){ var ship=BS.myOcc[i]!==undefined; h+='<div class="bs-cell'+(ship?' ship':'')+'"></div>'; }
+    h+='</div></div></div><div class="bs-label" style="margin-top:-4px;">Tap Shuffle to rearrange, then Start</div>';
+    areas.bs.innerHTML=h;
+    statusEl.textContent='Place your ships';
+    document.getElementById('bsShuffle').addEventListener('click',function(){ var p=bsPlaceRandomSafe(); BS.myShips=p.ships; BS.myOcc=p.occ; bsRenderSetup(); });
+    document.getElementById('bsStart').addEventListener('click',bsBegin);
+  }
+  function bsBegin(){ BS.phase='play'; bsRenderPlay(); statusEl.textContent='Fire at the enemy!'; }
+  function bsSunkSet(ships){ var set={}; ships.forEach(function(s){ if(s.hits>=s.len){ s.cells.forEach(function(x){set[x]=1;}); } }); return set; }
+  function bsRenderPlay(){
+    var foeSunk=bsSunkSet(BS.foeShips);
+    var mySunk=bsSunkSet(BS.myShips);
+    var h='<div class="bs-wrap">';
+    h+='<div><div class="bs-label">Enemy waters — tap to fire</div><div class="bs-grid bs-fire'+(BS.over?' locked':'')+'" id="bsFoe">';
+    for(var i=0;i<BSN*BSN;i++){ var cls='bs-cell'; if(BS.myShots[i]==='hit'){ cls+=foeSunk[i]?' sunk':' hit'; } else if(BS.myShots[i]==='miss'){ cls+=' miss'; } h+='<div class="'+cls+'" data-i="'+i+'"></div>'; }
+    h+='</div></div>';
+    h+='<div><div class="bs-label">Your fleet</div><div class="bs-grid" id="bsMine">';
+    for(var j=0;j<BSN*BSN;j++){ var c2='bs-cell',isShip=BS.myOcc[j]!==undefined; if(BS.foeShots[j]==='hit'){ c2+=mySunk[j]?' sunk':' hit'; } else if(BS.foeShots[j]==='miss'){ c2+=' miss'; } else if(isShip){ c2+=' ship'; } h+='<div class="'+c2+'"></div>'; }
+    h+='</div></div></div>';
+    areas.bs.innerHTML=h;
+    if(!BS.over){ areas.bs.querySelectorAll('#bsFoe .bs-cell').forEach(function(el){ el.addEventListener('click',function(){ bsFire(parseInt(el.getAttribute('data-i'),10)); }); }); }
+  }
+  function bsAllSunk(ships){ return ships.every(function(s){return s.hits>=s.len;}); }
+  function bsFire(i){ if(BS.over||BS.phase!=='play') return; if(BS.myShots[i]) return; var sh=BS.foeOcc[i];
+    if(sh!==undefined){ BS.myShots[i]='hit'; BS.foeShips[sh].hits++; } else { BS.myShots[i]='miss'; }
+    bsRenderPlay();
+    if(bsAllSunk(BS.foeShips)){ BS.over=true; scores.a++; scA.textContent=scores.a; statusEl.textContent='You win! \uD83C\uDF89 All enemy ships sunk'; reportWin(); bsRenderPlay(); return; }
+    statusEl.textContent=(sh!==undefined)?'Hit! Enemy returns fire…':'Miss. Enemy returns fire…';
+    setTimeout(bsAiTurn,600);
+  }
+  function bsAiTurn(){ if(BS.over) return; var ai=BS.ai,pick=-1;
+    while(ai.queue.length){ var q=ai.queue.shift(); if(BS.foeShots[q]===undefined){ pick=q; break; } }
+    if(pick===-1){ var cands=[]; for(var i=0;i<BSN*BSN;i++){ if(BS.foeShots[i]!==undefined) continue; if(ai.diff==='hard'){ var r=(i/BSN)|0,c=i%BSN; if((r+c)%2!==0) continue; } cands.push(i); } if(!cands.length){ for(var j=0;j<BSN*BSN;j++) if(BS.foeShots[j]===undefined) cands.push(j); } pick=cands[Math.floor(Math.random()*cands.length)]; }
+    var sh=BS.myOcc[pick];
+    if(sh!==undefined){ BS.foeShots[pick]='hit'; BS.myShips[sh].hits++; if(ai.diff!=='easy'){ var r=(pick/BSN)|0,c=pick%BSN; [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(function(d){ if(bsIn(d[0],d[1])){ var n=bsIdx(d[0],d[1]); if(BS.foeShots[n]===undefined) ai.queue.push(n); } }); } }
+    else { BS.foeShots[pick]='miss'; }
+    bsRenderPlay();
+    if(bsAllSunk(BS.myShips)){ BS.over=true; scores.b++; scB.textContent=scores.b; statusEl.textContent='Computer wins! Your fleet is sunk.'; reportResult('loss'); bsRenderPlay(); return; }
+    statusEl.textContent=(sh!==undefined)?'Enemy hit your ship! Your turn':'Enemy missed. Your turn — fire!';
+  }
+
   // ONLINE (tic-tac-toe only)
   function randCode(){ var c='',a='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; for(var i=0;i<4;i++) c+=a[Math.floor(Math.random()*a.length)]; return c; }
   function addChat(text,mine){ var empty=chatLog.querySelector('.chat-empty'); if(empty) empty.remove(); var m=document.createElement('div'); m.className='chat-msg '+(mine?'me':'them'); m.textContent=text; chatLog.appendChild(m); chatLog.scrollTop=chatLog.scrollHeight; }
@@ -408,9 +478,10 @@
     else if(game==='rps'){ modesEl.classList.add('hidden'); diffEl.classList.add('hidden'); setLabels('You','CPU'); }
     else if(game==='mem'){ modesEl.classList.add('hidden'); diffEl.classList.add('hidden'); setLabels('Wins','—'); }
     else if(game==='chk'){ modesEl.classList.remove('hidden'); diffEl.classList.toggle('hidden',mode!=='cpu'); setLabels(mode==='cpu'?'You':'Red',mode==='cpu'?'CPU':'Black'); }
+    else if(game==='bs'){ mode='cpu'; modesEl.classList.add('hidden'); diffEl.classList.remove('hidden'); setLabels('You','CPU'); }
     startGame();
   }
-  function startGame(){ if(game==='ttt') tttNew(true); else if(game==='c4') c4New(); else if(game==='rps') rpsNew(); else if(game==='mem') memNew(); else if(game==='chk') ckNew(); }
+  function startGame(){ if(game==='ttt') tttNew(true); else if(game==='c4') c4New(); else if(game==='rps') rpsNew(); else if(game==='mem') memNew(); else if(game==='chk') ckNew(); else if(game==='bs') bsNew(); }
 
   function openGame(g){ game=g; mode='2p'; modesEl.querySelectorAll('.mode').forEach(function(m){ m.classList.toggle('active',m.getAttribute('data-m')==='2p'); }); resetScores(); homeEl.classList.add('hide'); gameviewEl.classList.add('show'); configForGame(); window.scrollTo(0,0); }
   function goHome(){ closeWs(); gameviewEl.classList.remove('show'); homeEl.classList.remove('hide'); window.scrollTo(0,0); }
