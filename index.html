@@ -399,31 +399,40 @@
     CK.turn='r'; ckStatus();
   }
 
-  // BATTLESHIP (vs CPU; auto + manual placement; Easy/Medium/Hard hunting AI)
+  // BATTLESHIP (vs CPU; shuffle + manual placement; hit=shoot again; Easy/Medium/Hard AI)
   var BSN=10, BSFLEET=[5,4,3,3,2];
-  var BS={phase:'setup',myShips:[],myOcc:{},foeShips:[],foeOcc:[],myShots:{},foeShots:{},place:{orient:'h',shipIdx:0,cells:[]},ai:null,over:false};
+  var BS={phase:'setup',myShips:[],myOcc:{},foeShips:[],foeOcc:{},myShots:{},foeShots:{},placeIdx:0,orient:true,ai:null,over:false};
   function bsIdx(r,c){return r*BSN+c;}
   function bsIn(r,c){return r>=0&&r<BSN&&c>=0&&c<BSN;}
   function bsPlaceRandom(){ var occ={},ships=[]; for(var s=0;s<BSFLEET.length;s++){ var len=BSFLEET[s],placed=false,tries=0; while(!placed&&tries<800){ tries++; var horiz=Math.random()<0.5,r=Math.floor(Math.random()*BSN),c=Math.floor(Math.random()*BSN),cells=[],ok=true; for(var k=0;k<len;k++){ var rr=horiz?r:r+k,cc=horiz?c+k:c; if(!bsIn(rr,cc)||occ[bsIdx(rr,cc)]!==undefined){ok=false;break;} cells.push(bsIdx(rr,cc)); } if(ok){ var si=ships.length; cells.forEach(function(x){occ[x]=si;}); ships.push({len:len,cells:cells,hits:0}); placed=true; } } if(!placed) return null; } return {ships:ships,occ:occ}; }
   function bsPlaceRandomSafe(){ var p=null; while(!p) p=bsPlaceRandom(); return p; }
-  function bsNew(){ BS.phase='setup'; BS.over=false; var p=bsPlaceRandomSafe(); BS.myShips=p.ships; BS.myOcc=p.occ; BS.myShots={}; BS.foeShots={}; var f=bsPlaceRandomSafe(); BS.foeShips=f.ships; BS.foeOcc=f.occ; BS.ai={diff:difficulty,tried:{},queue:[]}; BS.place={orient:'h',shipIdx:0,cells:[]}; bsRenderSetup(); }
+  function bsTryManual(len,r,c,horiz){ var cells=[]; for(var k=0;k<len;k++){ var rr=horiz?r:r+k,cc=horiz?c+k:c; if(!bsIn(rr,cc)||BS.myOcc[bsIdx(rr,cc)]!==undefined) return null; cells.push(bsIdx(rr,cc)); } return cells; }
+  function bsNew(){ BS.phase='setup'; BS.over=false; BS.myShips=[]; BS.myOcc={}; BS.myShots={}; BS.foeShots={}; BS.placeIdx=0; BS.orient=true; var f=bsPlaceRandomSafe(); BS.foeShips=f.ships; BS.foeOcc=f.occ; BS.ai={diff:difficulty,tried:{},queue:[]}; bsRenderSetup(); }
   function bsRenderSetup(){
-    var h='<div class="bs-setup-row"><button class="obtn primary" id="bsShuffle">Shuffle</button><button class="obtn secondary" id="bsStart">Start game</button></div>';
+    var done=BS.placeIdx>=BSFLEET.length;
+    var h='<div class="bs-setup-row"><button class="obtn primary" id="bsShuffle">Shuffle all</button>';
+    if(!done) h+='<button class="obtn secondary" id="bsRotate">Rotate: '+(BS.orient?'\u2194 across':'\u2195 down')+'</button>';
+    h+='</div>';
+    h+='<div class="bs-setup-row"><button class="obtn secondary" id="bsClear">Clear</button><button class="obtn primary" id="bsStart"'+(done?'':' disabled style="opacity:.5;"')+'>Start game</button></div>';
     h+='<div class="bs-wrap"><div><div class="bs-label">Your fleet</div><div class="bs-grid" id="bsMy">';
-    for(var i=0;i<BSN*BSN;i++){ var ship=BS.myOcc[i]!==undefined; h+='<div class="bs-cell'+(ship?' ship':'')+'"></div>'; }
-    h+='</div></div></div><div class="bs-label" style="margin-top:-4px;">Tap Shuffle to rearrange, then Start</div>';
+    for(var i=0;i<BSN*BSN;i++){ var ship=BS.myOcc[i]!==undefined; h+='<div class="bs-cell'+(ship?' ship':'')+'" data-i="'+i+'"></div>'; }
+    h+='</div></div></div>';
+    h+='<div class="bs-label" style="margin-top:-4px;">'+(done?'All ships placed \u2014 tap Start':'Tap a square to place your '+BSFLEET[BS.placeIdx]+'-long ship (or Shuffle all)')+'</div>';
     areas.bs.innerHTML=h;
     statusEl.textContent='Place your ships';
-    document.getElementById('bsShuffle').addEventListener('click',function(){ var p=bsPlaceRandomSafe(); BS.myShips=p.ships; BS.myOcc=p.occ; bsRenderSetup(); });
-    document.getElementById('bsStart').addEventListener('click',bsBegin);
+    document.getElementById('bsShuffle').addEventListener('click',function(){ var p=bsPlaceRandomSafe(); BS.myShips=p.ships; BS.myOcc=p.occ; BS.placeIdx=BSFLEET.length; bsRenderSetup(); });
+    document.getElementById('bsClear').addEventListener('click',function(){ BS.myShips=[]; BS.myOcc={}; BS.placeIdx=0; bsRenderSetup(); });
+    var rot=document.getElementById('bsRotate'); if(rot) rot.addEventListener('click',function(){ BS.orient=!BS.orient; bsRenderSetup(); });
+    var st=document.getElementById('bsStart'); if(st&&done) st.addEventListener('click',bsBegin);
+    if(!done){ areas.bs.querySelectorAll('#bsMy .bs-cell').forEach(function(el){ el.addEventListener('click',function(){ bsPlaceClick(parseInt(el.getAttribute('data-i'),10)); }); }); }
   }
-  function bsBegin(){ BS.phase='play'; bsRenderPlay(); statusEl.textContent='Fire at the enemy!'; }
+  function bsPlaceClick(i){ if(BS.placeIdx>=BSFLEET.length) return; var r=(i/BSN)|0,c=i%BSN,len=BSFLEET[BS.placeIdx]; var cells=bsTryManual(len,r,c,BS.orient); if(!cells){ statusEl.textContent="Won't fit there \u2014 try another spot"; return; } var si=BS.myShips.length; cells.forEach(function(x){BS.myOcc[x]=si;}); BS.myShips.push({len:len,cells:cells,hits:0}); BS.placeIdx++; bsRenderSetup(); }
+  function bsBegin(){ if(BS.myShips.length<BSFLEET.length) return; BS.phase='play'; bsRenderPlay(); statusEl.textContent='Your turn \u2014 fire!'; }
   function bsSunkSet(ships){ var set={}; ships.forEach(function(s){ if(s.hits>=s.len){ s.cells.forEach(function(x){set[x]=1;}); } }); return set; }
   function bsRenderPlay(){
-    var foeSunk=bsSunkSet(BS.foeShips);
-    var mySunk=bsSunkSet(BS.myShips);
+    var foeSunk=bsSunkSet(BS.foeShips), mySunk=bsSunkSet(BS.myShips);
     var h='<div class="bs-wrap">';
-    h+='<div><div class="bs-label">Enemy waters — tap to fire</div><div class="bs-grid bs-fire'+(BS.over?' locked':'')+'" id="bsFoe">';
+    h+='<div><div class="bs-label">Enemy waters \u2014 tap to fire</div><div class="bs-grid bs-fire'+(BS.over?' locked':'')+'" id="bsFoe">';
     for(var i=0;i<BSN*BSN;i++){ var cls='bs-cell'; if(BS.myShots[i]==='hit'){ cls+=foeSunk[i]?' sunk':' hit'; } else if(BS.myShots[i]==='miss'){ cls+=' miss'; } h+='<div class="'+cls+'" data-i="'+i+'"></div>'; }
     h+='</div></div>';
     h+='<div><div class="bs-label">Your fleet</div><div class="bs-grid" id="bsMine">';
@@ -437,18 +446,20 @@
     if(sh!==undefined){ BS.myShots[i]='hit'; BS.foeShips[sh].hits++; } else { BS.myShots[i]='miss'; }
     bsRenderPlay();
     if(bsAllSunk(BS.foeShips)){ BS.over=true; scores.a++; scA.textContent=scores.a; statusEl.textContent='You win! \uD83C\uDF89 All enemy ships sunk'; reportWin(); bsRenderPlay(); return; }
-    statusEl.textContent=(sh!==undefined)?'Hit! Enemy returns fire…':'Miss. Enemy returns fire…';
-    setTimeout(bsAiTurn,600);
+    if(sh!==undefined){ statusEl.textContent='Hit! Fire again \uD83C\uDFAF'; }
+    else { statusEl.textContent='Miss. Enemy returns fire\u2026'; var fire=document.getElementById('bsFoe'); if(fire) fire.classList.add('locked'); setTimeout(bsAiTurn,650); }
   }
-  function bsAiTurn(){ if(BS.over) return; var ai=BS.ai,pick=-1;
+  function bsAiShootOnce(){ var ai=BS.ai,pick=-1;
     while(ai.queue.length){ var q=ai.queue.shift(); if(BS.foeShots[q]===undefined){ pick=q; break; } }
-    if(pick===-1){ var cands=[]; for(var i=0;i<BSN*BSN;i++){ if(BS.foeShots[i]!==undefined) continue; if(ai.diff==='hard'){ var r=(i/BSN)|0,c=i%BSN; if((r+c)%2!==0) continue; } cands.push(i); } if(!cands.length){ for(var j=0;j<BSN*BSN;j++) if(BS.foeShots[j]===undefined) cands.push(j); } pick=cands[Math.floor(Math.random()*cands.length)]; }
+    if(pick===-1){ var cands=[]; for(var i=0;i<BSN*BSN;i++){ if(BS.foeShots[i]!==undefined) continue; if(ai.diff==='hard'){ var r=(i/BSN)|0,c=i%BSN; if((r+c)%2!==0) continue; } cands.push(i); } if(!cands.length){ for(var j=0;j<BSN*BSN;j++) if(BS.foeShots[j]===undefined) cands.push(j); } if(!cands.length) return null; pick=cands[Math.floor(Math.random()*cands.length)]; }
     var sh=BS.myOcc[pick];
-    if(sh!==undefined){ BS.foeShots[pick]='hit'; BS.myShips[sh].hits++; if(ai.diff!=='easy'){ var r=(pick/BSN)|0,c=pick%BSN; [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(function(d){ if(bsIn(d[0],d[1])){ var n=bsIdx(d[0],d[1]); if(BS.foeShots[n]===undefined) ai.queue.push(n); } }); } }
-    else { BS.foeShots[pick]='miss'; }
-    bsRenderPlay();
+    if(sh!==undefined){ BS.foeShots[pick]='hit'; BS.myShips[sh].hits++; if(ai.diff!=='easy'){ var r=(pick/BSN)|0,c=pick%BSN; [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(function(d){ if(bsIn(d[0],d[1])){ var n=bsIdx(d[0],d[1]); if(BS.foeShots[n]===undefined) ai.queue.push(n); } }); } return 'hit'; }
+    BS.foeShots[pick]='miss'; return 'miss';
+  }
+  function bsAiTurn(){ if(BS.over) return; var res=bsAiShootOnce(); bsRenderPlay();
     if(bsAllSunk(BS.myShips)){ BS.over=true; scores.b++; scB.textContent=scores.b; statusEl.textContent='Computer wins! Your fleet is sunk.'; reportResult('loss'); bsRenderPlay(); return; }
-    statusEl.textContent=(sh!==undefined)?'Enemy hit your ship! Your turn':'Enemy missed. Your turn — fire!';
+    if(res==='hit'){ statusEl.textContent='Enemy hit your ship! They fire again\u2026'; setTimeout(bsAiTurn,650); }
+    else { statusEl.textContent='Enemy missed. Your turn \u2014 fire!'; }
   }
 
   // ONLINE (tic-tac-toe only)
