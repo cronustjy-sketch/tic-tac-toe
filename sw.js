@@ -1,4 +1,4 @@
-var CACHE='cronus-games-v9';
+var CACHE='cronus-games-v12';
 var ASSETS=['/','/index.html','/manifest.json','/icon-192.png','/icon-512.png'];
 
 self.addEventListener('install',function(e){
