@@ -127,9 +127,34 @@
   .chk-pc{width:74%;height:74%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 3px 6px rgba(0,0,0,.35);}
   .chk-pc.r{background:radial-gradient(circle at 35% 30%,#e8654f,#c0392b);}
   .chk-pc.b{background:radial-gradient(circle at 35% 30%,#555,#222);}
-  .chk-pc.king::after{content:'\\265B';color:rgba(255,255,255,.92);font-size:1.1rem;}
+  .chk-pc.king::after{content:'♛';color:rgba(255,255,255,.92);font-size:1.1rem;}
   .tile.t-bs{background:linear-gradient(150deg,#2ad0c4,#1f7d8c);}
   .tile.t-hm{background:linear-gradient(150deg,#8cd14a,#4a8c1b);}
+  .tile.t-ms{background:linear-gradient(150deg,#5c6b7a,#2c3742);}
+  .tile.t-db{background:linear-gradient(150deg,#f0a93d,#d87a1f);}
+  .ms-bar{display:flex;gap:8px;margin-bottom:1rem;align-items:center;}
+  .ms-flag-btn{flex:1;border:1px solid var(--line);background:var(--cream);cursor:pointer;font-family:inherit;font-weight:800;font-size:.9rem;color:var(--ink);padding:11px;border-radius:12px;transition:.2s;}
+  .ms-flag-btn.on{background:var(--x);color:#fff;border-color:var(--x);}
+  .ms-info{flex:1;text-align:center;font-weight:800;color:var(--soft);font-size:.95rem;}
+  .ms-grid{display:grid;gap:3px;margin-bottom:1.25rem;background:var(--line);border:2px solid var(--ink);border-radius:8px;padding:3px;}
+  .ms-cell{aspect-ratio:1;background:#cfe0ee;border:none;border-radius:3px;cursor:pointer;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(.8rem,4vw,1.2rem);display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0;}
+  .ms-cell.revealed{background:#f3ece1;cursor:default;}
+  .ms-cell.mine{background:#c0392b;}
+  .ms-cell.flag{background:#ffe7d4;}
+  .ms-c1{color:#3a6ea5;}.ms-c2{color:#3a8a4a;}.ms-c3{color:#d8662a;}.ms-c4{color:#6a5cff;}
+  .ms-c5{color:#c0392b;}.ms-c6{color:#2bb6a3;}.ms-c7{color:#8d4f89;}.ms-c8{color:#555;}
+  .db-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:1.25rem;}
+  .db-grid{position:relative;touch-action:manipulation;}
+  .db-dot{position:absolute;width:10px;height:10px;background:var(--ink);border-radius:50%;transform:translate(-50%,-50%);}
+  .db-edge{position:absolute;background:var(--line);border-radius:6px;cursor:pointer;transition:background .15s;}
+  .db-edge.h{height:8px;transform:translateY(-50%);}
+  .db-edge.v{width:8px;transform:translateX(-50%);}
+  .db-edge:hover{background:#f0c89a;}
+  .db-edge.on{background:var(--ink);cursor:default;}
+  .db-edge.on.p1{background:var(--x);}
+  .db-edge.on.p2{background:var(--o);}
+  .db-box{position:absolute;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:900;font-size:1.2rem;transform:translate(-50%,-50%);}
+  .db-box.p1{color:var(--x);}.db-box.p2{color:var(--o);}
   .hm-word{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:1.25rem;}
   .hm-let{width:34px;height:44px;border-bottom:3px solid var(--ink);display:flex;align-items:flex-end;justify-content:center;font-family:'Fraunces',serif;font-weight:900;font-size:1.8rem;padding-bottom:4px;}
   .hm-let.space{border:none;width:16px;}
@@ -149,11 +174,11 @@
   .bs-cell{aspect-ratio:1;background:#bfe3ea;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;}
   .bs-cell.ship{background:#6b7785;}
   .bs-cell.miss{background:#d9eef2;}
-  .bs-cell.miss::after{content:'\\00b7';color:#7a8a90;font-size:1.2rem;}
+  .bs-cell.miss::after{content:'·';color:#7a8a90;font-size:1.2rem;}
   .bs-cell.hit{background:#e8843f;}
-  .bs-cell.hit::after{content:'\\2715';color:#fff;font-weight:900;}
+  .bs-cell.hit::after{content:'✕';color:#fff;font-weight:900;}
   .bs-cell.sunk{background:#c0392b;}
-  .bs-cell.sunk::after{content:'\\2715';color:#fff;font-weight:900;}
+  .bs-cell.sunk::after{content:'✕';color:#fff;font-weight:900;}
   .bs-fire .bs-cell:hover{outline:2px solid var(--x);}
   .bs-fire.locked{opacity:.6;pointer-events:none;}
   .bs-setup-row{display:flex;gap:8px;margin-bottom:1rem;}
@@ -196,6 +221,8 @@
   .tile:nth-child(5){animation-delay:.33s,2s;}
   .tile:nth-child(6){animation-delay:.4s,2.5s;}
   .tile:nth-child(7){animation-delay:.47s,3s;}
+  .tile:nth-child(8){animation-delay:.54s,3.4s;}
+  .tile:nth-child(9){animation-delay:.61s,3.8s;}
   .tile:hover{transform:translateY(-10px) scale(1.07) rotate(-1deg);box-shadow:0 34px 50px -14px rgba(0,0,0,.45),0 0 30px rgba(255,255,255,.35);}
   .tile:active{transform:scale(.94);}
   .tile::after{content:'';position:absolute;top:0;left:-80%;width:60%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);pointer-events:none;z-index:2;}
@@ -229,6 +256,8 @@
       <button class="tile t-chk" data-go="chk"><span class="ico">&#9899;</span><span class="tname">Checkers</span><span class="tsub">vs CPU · 2P</span></button>
       <button class="tile t-bs" data-go="bs"><span class="ico">&#128674;</span><span class="tname">Battleship</span><span class="tsub">vs CPU</span></button>
       <button class="tile t-hm" data-go="hm"><span class="ico">&#127935;</span><span class="tname">Hangman</span><span class="tsub">solo</span></button>
+      <button class="tile t-ms" data-go="ms"><span class="ico">&#128163;</span><span class="tname">Minesweeper</span><span class="tsub">solo</span></button>
+      <button class="tile t-db" data-go="db"><span class="ico">&#9633;</span><span class="tname">Dots &amp; Boxes</span><span class="tsub">vs CPU</span></button>
     </div>
     <button class="lb-toggle" id="lbToggleHome" style="margin-top:16px;">&#127942; Show leaderboard</button>
     <div class="leaderboard" id="leaderboardHome">
@@ -277,6 +306,8 @@
     <div id="area-chk" class="hidden"></div>
     <div id="area-bs" class="hidden"></div>
     <div id="area-hm" class="hidden"></div>
+    <div id="area-ms" class="hidden"></div>
+    <div id="area-db" class="hidden"></div>
 
     <div class="scores" id="scores">
       <div class="score"><div class="lbl" id="lblA">P1</div><div class="val" id="scA">0</div></div>
@@ -392,7 +423,7 @@
   var nameModal=document.getElementById('nameModal'),nameInput=document.getElementById('nameInput'),nameSave=document.getElementById('nameSave');
   var chatEl=document.getElementById('chat'),chatLog=document.getElementById('chatLog'),chatInput=document.getElementById('chatInput'),chatSend=document.getElementById('chatSend');
   var scores={a:0,b:0,d:0};
-  var areas={ttt:document.getElementById('area-ttt'),c4:document.getElementById('area-c4'),rps:document.getElementById('area-rps'),mem:document.getElementById('area-mem'),chk:document.getElementById('area-chk'),bs:document.getElementById('area-bs'),hm:document.getElementById('area-hm')};
+  var areas={ttt:document.getElementById('area-ttt'),c4:document.getElementById('area-c4'),rps:document.getElementById('area-rps'),mem:document.getElementById('area-mem'),chk:document.getElementById('area-chk'),bs:document.getElementById('area-bs'),hm:document.getElementById('area-hm'),ms:document.getElementById('area-ms'),db:document.getElementById('area-db')};
   var ws=null,room=null,myMark=null,onlineConnected=false;
 
   var playerName=getName();
@@ -614,6 +645,89 @@
     statusEl.textContent=(HM.word.indexOf(L)!==-1)?'Nice!':'Nope\u2026';
   }
 
+  // MINESWEEPER (solo; first tap always safe; flag mode for touch)
+  var MSR=9,MSC=9,MSMINES=10;
+  var MS={mines:{},count:{},revealed:{},flags:{},started:false,over:false,flagMode:false,left:0};
+  function msNew(){ MS.mines={};MS.count={};MS.revealed={};MS.flags={};MS.started=false;MS.over=false;MS.flagMode=false;MS.left=MSR*MSC-MSMINES; msRender(); statusEl.textContent='Tap a square to start'; }
+  function msPlace(safeR,safeC){ var banned={}; for(var dr=-1;dr<=1;dr++)for(var dc=-1;dc<=1;dc++){ var rr=safeR+dr,cc=safeC+dc; if(rr>=0&&rr<MSR&&cc>=0&&cc<MSC) banned[rr*MSC+cc]=1; } var placed=0,guard=0; while(placed<MSMINES&&guard<10000){ guard++; var i=Math.floor(Math.random()*MSR*MSC); if(MS.mines[i]||banned[i]) continue; MS.mines[i]=1; placed++; } for(var r=0;r<MSR;r++)for(var c=0;c<MSC;c++){ var idx=r*MSC+c; if(MS.mines[idx]){MS.count[idx]=-1;continue;} var n=0; for(var a=-1;a<=1;a++)for(var b=-1;b<=1;b++){ var nr=r+a,nc=c+b; if(nr>=0&&nr<MSR&&nc>=0&&nc<MSC&&MS.mines[nr*MSC+nc]) n++; } MS.count[idx]=n; } MS.started=true; }
+  function msFlood(start){ var stack=[start]; while(stack.length){ var idx=stack.pop(); if(MS.revealed[idx]) continue; if(MS.flags[idx]) continue; MS.revealed[idx]=1; if(MS.count[idx]===0){ var r=(idx/MSC)|0,c=idx%MSC; for(var a=-1;a<=1;a++)for(var b=-1;b<=1;b++){ var nr=r+a,nc=c+b; if(nr>=0&&nr<MSR&&nc>=0&&nc<MSC){ var n=nr*MSC+nc; if(!MS.revealed[n]&&MS.count[n]!==-1) stack.push(n); } } } } }
+  function msCountRevealed(){ var n=0; for(var k in MS.revealed) n++; return n; }
+  function msRender(){
+    var flagsUsed=0; for(var k in MS.flags) flagsUsed++;
+    var h='<div class="ms-bar"><button class="ms-flag-btn'+(MS.flagMode?' on':'')+'" id="msFlagBtn">\uD83D\uDEA9 Flag: '+(MS.flagMode?'ON':'OFF')+'</button><div class="ms-info">\uD83D\uDCA3 '+(MSMINES-flagsUsed)+'</div></div>';
+    h+='<div class="ms-grid" id="msGrid" style="grid-template-columns:repeat('+MSC+',1fr);">';
+    for(var i=0;i<MSR*MSC;i++){
+      var cls='ms-cell',txt='';
+      if(MS.revealed[i]){ cls+=' revealed'; if(MS.count[i]===-1){ cls+=' mine'; txt='\uD83D\uDCA3'; } else if(MS.count[i]>0){ cls+=' ms-c'+MS.count[i]; txt=MS.count[i]; } }
+      else if(MS.flags[i]){ cls+=' flag'; txt='\uD83D\uDEA9'; }
+      h+='<button class="'+cls+'" data-i="'+i+'">'+txt+'</button>';
+    }
+    h+='</div>';
+    areas.ms.innerHTML=h;
+    document.getElementById('msFlagBtn').addEventListener('click',function(){ MS.flagMode=!MS.flagMode; msRender(); });
+    areas.ms.querySelectorAll('.ms-cell').forEach(function(b){ b.addEventListener('click',function(){ msTap(parseInt(b.getAttribute('data-i'),10)); }); });
+  }
+  function msTap(i){ if(MS.over) return;
+    if(MS.flagMode){ if(MS.revealed[i]) return; if(MS.flags[i]) delete MS.flags[i]; else MS.flags[i]=1; msRender(); return; }
+    if(MS.flags[i]) return;
+    if(!MS.started){ msPlace((i/MSC)|0,i%MSC); }
+    if(MS.mines[i]){ MS.over=true; for(var k in MS.mines) MS.revealed[k]=1; msRender(); statusEl.textContent='Boom! \uD83D\uDCA5 Game over'; scores.b++; scB.textContent=scores.b; return; }
+    msFlood(i); msRender();
+    if(msCountRevealed()>=MSR*MSC-MSMINES){ MS.over=true; statusEl.textContent='Cleared! \uD83C\uDF89 All mines avoided'; scores.a++; scA.textContent=scores.a; reportWin(); return; }
+    statusEl.textContent='Safe! Keep going';
+  }
+
+  // DOTS AND BOXES (vs CPU; complete a box to go again)
+  var DBN=5, DBB=DBN-1; // 5 dots => 4x4 boxes
+  var DB={H:[],V:[],owner:[],turn:1,over:false};
+  function dbNew(){ DB.H=[];DB.V=[];DB.owner=[];DB.turn=1;DB.over=false;
+    for(var r=0;r<DBN;r++){ DB.H.push([]); for(var c=0;c<DBN-1;c++) DB.H[r].push(0); }
+    for(var r=0;r<DBN-1;r++){ DB.V.push([]); for(var c=0;c<DBN;c++) DB.V[r].push(0); }
+    for(var r=0;r<DBB;r++){ DB.owner.push([]); for(var c=0;c<DBB;c++) DB.owner[r].push(0); }
+    dbRender(); dbStatus();
+  }
+  function dbStatus(){ if(DB.over) return; statusEl.textContent=(DB.turn===1)?'Your turn':'Computer thinking\u2026'; }
+  function dbBoxSides(r,c){ return (DB.H[r][c]?1:0)+(DB.H[r+1][c]?1:0)+(DB.V[r][c]?1:0)+(DB.V[r][c+1]?1:0); }
+  function dbClaim(player){ var got=0; for(var br=0;br<DBB;br++)for(var bc=0;bc<DBB;bc++){ if(DB.owner[br][bc]===0&&dbBoxSides(br,bc)===4){ DB.owner[br][bc]=player; got++; } } return got; }
+  function dbEdgesLeft(){ var n=0; for(var r=0;r<DBN;r++)for(var c=0;c<DBN-1;c++) if(!DB.H[r][c]) n++; for(var r=0;r<DBN-1;r++)for(var c=0;c<DBN;c++) if(!DB.V[r][c]) n++; return n; }
+  function dbScores(){ var s={1:0,2:0}; for(var r=0;r<DBB;r++)for(var c=0;c<DBB;c++){ if(DB.owner[r][c]) s[DB.owner[r][c]]++; } return s; }
+  function dbRender(){
+    var size=Math.min(360, (window.innerWidth||360)-72); var gap=size/(DBN-1); var pad=14;
+    var dim=size+pad*2;
+    var h='<div class="db-wrap"><div class="db-grid" id="dbGrid" style="width:'+dim+'px;height:'+dim+'px;">';
+    // boxes (owners)
+    for(var br=0;br<DBB;br++)for(var bc=0;bc<DBB;bc++){ if(DB.owner[br][bc]){ var cx=pad+bc*gap+gap/2, cy=pad+br*gap+gap/2; h+='<div class="db-box p'+DB.owner[br][bc]+'" style="left:'+cx+'px;top:'+cy+'px;">'+(DB.owner[br][bc]===1?'\uD83D\uDFE0':'\uD83D\uDD37')+'</div>'; } }
+    // horizontal edges
+    for(var r=0;r<DBN;r++)for(var c=0;c<DBN-1;c++){ var x=pad+c*gap, y=pad+r*gap; var on=DB.H[r][c]; h+='<div class="db-edge h'+(on?' on p'+on:'')+'" data-t="h" data-r="'+r+'" data-c="'+c+'" style="left:'+x+'px;top:'+y+'px;width:'+gap+'px;"></div>'; }
+    // vertical edges
+    for(var r=0;r<DBN-1;r++)for(var c=0;c<DBN;c++){ var x=pad+c*gap, y=pad+r*gap; var on=DB.V[r][c]; h+='<div class="db-edge v'+(on?' on p'+on:'')+'" data-t="v" data-r="'+r+'" data-c="'+c+'" style="left:'+x+'px;top:'+y+'px;height:'+gap+'px;"></div>'; }
+    // dots
+    for(var r=0;r<DBN;r++)for(var c=0;c<DBN;c++){ var x=pad+c*gap, y=pad+r*gap; h+='<div class="db-dot" style="left:'+x+'px;top:'+y+'px;"></div>'; }
+    h+='</div></div>';
+    var sc=dbScores();
+    areas.db.innerHTML=h;
+    setLabels('You','CPU'); scA.textContent=sc[1]; scB.textContent=sc[2];
+    if(DB.turn===1&&!DB.over){ areas.db.querySelectorAll('.db-edge:not(.on)').forEach(function(e){ e.addEventListener('click',function(){ dbPlay(e.getAttribute('data-t'),parseInt(e.getAttribute('data-r'),10),parseInt(e.getAttribute('data-c'),10)); }); }); }
+  }
+  function dbApply(type,r,c,player){ if(type==='h'){ if(DB.H[r][c]) return -1; DB.H[r][c]=player; } else { if(DB.V[r][c]) return -1; DB.V[r][c]=player; } return dbClaim(player); }
+  function dbFinish(){ if(dbEdgesLeft()===0){ DB.over=true; var s=dbScores(); if(s[1]>s[2]){ statusEl.textContent='You win '+s[1]+'\u2013'+s[2]+'! \uD83C\uDF89'; scores.a=s[1]; reportWin(); } else if(s[2]>s[1]){ statusEl.textContent='Computer wins '+s[2]+'\u2013'+s[1]; } else { statusEl.textContent="It's a tie "+s[1]+'\u2013'+s[2]; } dbRender(); return true; } return false; }
+  function dbPlay(type,r,c){ if(DB.over||DB.turn!==1) return; var got=dbApply(type,r,c,1); if(got<0) return; dbRender(); if(dbFinish()) return; if(got===0){ DB.turn=2; dbStatus(); setTimeout(dbCpu,500); } else { dbStatus(); } }
+  function dbAllEdges(){ var e=[]; for(var r=0;r<DBN;r++)for(var c=0;c<DBN-1;c++) if(!DB.H[r][c]) e.push(['h',r,c]); for(var r=0;r<DBN-1;r++)for(var c=0;c<DBN;c++) if(!DB.V[r][c]) e.push(['v',r,c]); return e; }
+  function dbMakesThree(type,r,c){ if(type==='h') DB.H[r][c]=9; else DB.V[r][c]=9; var bad=false; for(var br=0;br<DBB;br++)for(var bc=0;bc<DBB;bc++){ if(DB.owner[br][bc]===0&&dbBoxSides(br,bc)===3){ bad=true; } } if(type==='h') DB.H[r][c]=0; else DB.V[r][c]=0; return bad; }
+  function dbWouldClaim(type,r,c){ if(type==='h') DB.H[r][c]=9; else DB.V[r][c]=9; var got=0; for(var br=0;br<DBB;br++)for(var bc=0;bc<DBB;bc++){ if(DB.owner[br][bc]===0&&dbBoxSides(br,bc)===4) got++; } if(type==='h') DB.H[r][c]=0; else DB.V[r][c]=0; return got; }
+  function dbCpu(){ if(DB.over) return; var edges=dbAllEdges(),pick=null;
+    // 1. take any edge that completes a box
+    var claimers=edges.filter(function(e){ return dbWouldClaim(e[0],e[1],e[2])>0; });
+    if(claimers.length){ pick=claimers[Math.floor(Math.random()*claimers.length)]; }
+    else { // 2. prefer safe edges (don't create a 3-sided box)
+      var safe=edges.filter(function(e){ return !dbMakesThree(e[0],e[1],e[2]); });
+      var pool=(difficulty!=='easy'&&safe.length)?safe:edges;
+      if(difficulty==='easy') pool=edges;
+      pick=pool[Math.floor(Math.random()*pool.length)];
+    }
+    var got=dbApply(pick[0],pick[1],pick[2],2); if(got>0){ dbRender(); if(dbFinish()) return; setTimeout(dbCpu,500); } else { DB.turn=1; dbRender(); if(dbFinish()) return; dbStatus(); }
+  }
+
   // BATTLESHIP (vs CPU + online; shuffle + manual placement; hit=shoot again)
   var BSN=10, BSFLEET=[5,4,3,3,2];
   var BS={phase:'setup',myShips:[],myOcc:{},foeShips:[],foeOcc:{},myShots:{},foeShots:{},placeIdx:0,orient:true,ai:null,over:false,online:false,myTurn:false,iReady:false,foeReady:false};
@@ -747,9 +861,11 @@
     else if(game==='bs'){ modesEl.classList.remove('hidden'); modesEl.querySelector('[data-m="2p"]').classList.add('hidden'); diffEl.classList.toggle('hidden',mode!=='cpu'); panel.classList.toggle('show',mode==='online'); setLabels('You',mode==='online'?'Foe':'CPU'); }
     if(game!=='bs'){ var tpb=modesEl.querySelector('[data-m="2p"]'); if(tpb) tpb.classList.remove('hidden'); }
     if(game==='hm'){ modesEl.classList.add('hidden'); diffEl.classList.add('hidden'); setLabels('Wins','Losses'); }
+    if(game==='ms'){ modesEl.classList.add('hidden'); diffEl.classList.add('hidden'); setLabels('Wins','Losses'); }
+    if(game==='db'){ mode='cpu'; modesEl.classList.add('hidden'); diffEl.classList.remove('hidden'); setLabels('You','CPU'); }
     startGame();
   }
-  function startGame(){ if(game==='ttt') tttNew(true); else if(game==='c4') c4New(); else if(game==='rps') rpsNew(); else if(game==='mem') memNew(); else if(game==='chk') ckNew(); else if(game==='bs'){ if(mode==='online'){ /* started via connect */ } else bsNew(); } else if(game==='hm') hmNew(); }
+  function startGame(){ if(game==='ttt') tttNew(true); else if(game==='c4') c4New(); else if(game==='rps') rpsNew(); else if(game==='mem') memNew(); else if(game==='chk') ckNew(); else if(game==='bs'){ if(mode==='online'){ /* started via connect */ } else bsNew(); } else if(game==='hm') hmNew(); else if(game==='ms') msNew(); else if(game==='db') dbNew(); }
 
   function openGame(g){ game=g; mode=(g==='bs')?'cpu':'2p'; modesEl.querySelectorAll('.mode').forEach(function(m){ m.classList.toggle('active',m.getAttribute('data-m')===mode); }); resetScores(); homeEl.classList.add('hide'); gameviewEl.classList.add('show'); configForGame(); window.scrollTo(0,0); }
   function goHome(){ closeWs(); gameviewEl.classList.remove('show'); homeEl.classList.remove('hide'); window.scrollTo(0,0); }
